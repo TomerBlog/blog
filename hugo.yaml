@@ -1,0 +1,78 @@
+baseURL: https://example.org/
+languageCode: en-us
+title: TomerN
+theme: ["PaperMod"]    
+params:
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  description: "Yo"
+  author: Theme PaperMod
+  # author: ["Me", "You"] # multiple authors
+  assets:
+    customCSS:
+  defaultTheme: "auto"
+  themeColor: "red"
+  # disableThemeToggle: true
+  ShowShareButtons: true
+  ShowReadingTime: true
+  # disableSpecial1stPost: true
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowAllPagesInArchive: true
+  ShowPageNums: true
+  ShowToc: true
+  # comments: false
+  images: ["images/tomer.jpg"]
+  image: "/images/tomer.jpg"
+
+  profileMode:
+    enabled: false
+    title: PaperMod
+    imageUrl: "#"
+    imageTitle: my image
+    # imageWidth: 120
+    # imageHeight: 120
+    buttons:
+      - name: Archives
+        url: archives
+      - name: Tags
+        url: tags
+
+  homeInfoParams:
+    Title: "Tomer Nahum's Research Blog"
+    Content: >
+      👋 Welcome to my blog, I hope you like Entra and AD.
+      
+      
+  socialIcons:
+    - name: linkedin
+      title: Linkedin
+      url: "https://www.linkedin.com/in/tomer-nahum-977a021b5/"
+    - name: X
+      title: X
+      url: "https://x.com/TomerNahum1"
+menu:
+  main:
+    - identifier: Posts
+      name: Posts
+      url: /posts/
+      weight: 10
+    - identifier: Open Source Projects
+      name: Open Source Projects
+      url: /opensourceprojects/
+      weight: 20
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+    style: monokai
+    lineNos: true
+    lineNumbersInTable: true
+
+caches:
+  images:
+    dir: :cacheDir/images

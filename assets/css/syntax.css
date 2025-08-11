@@ -1,0 +1,12 @@
+.hljs {
+  background: #272822;
+  color: #f8f8f2;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.hljs-keyword { color: #66d9ef; }
+.hljs-string { color: #e6db74; }
+.hljs-comment { color: #75715e; font-style: italic; }
+.hljs-built_in { color: #a6e22e; }
+.hljs-number { color: #ae81ff; }

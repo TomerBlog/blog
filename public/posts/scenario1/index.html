@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>EntraGoat Scenario 1: Application Ownership Compromise in Entra ID | TomerN</title>
+<meta name="keywords" content="">
+<meta name="description" content="Misowned and dangerous: An Owner’s Manual to Global Admin
+We begin our EntraGoat use examples with Scenario 1, which we’ve named Misowned and Dangerous: An Owner’s Manual to Global Admin. This practical exercise showcases how legitimate application ownership in Microsoft Entra ID can be leveraged to escalate privileges and compromise a Global Administrator account—enabling complete tenant takeover.
+Starting with a compromised low-privileged user account, the attacker discovers ownership over an enterprise application (service principal) that is assigned a privileged role.">
+<meta name="author" content="Tomer Nahum, Jonathan Elkabas">
+<link rel="canonical" href="http://localhost:1313/posts/scenario1/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fed13c992360e4d7010e740c7b8d87665399d4995b4155fa8c51ba9957c69fb4.css" integrity="sha256-/tE8mSNg5NcBDnQMe42HZlOZ1JlbQVX6jFG6mVfGn7Q=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/scenario1/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><html>
+
+<body>
+
+</body>
+</html><meta property="og:url" content="http://localhost:1313/posts/scenario1/">
+  <meta property="og:site_name" content="TomerN">
+  <meta property="og:title" content="EntraGoat Scenario 1: Application Ownership Compromise in Entra ID">
+  <meta property="og:description" content="Misowned and dangerous: An Owner’s Manual to Global Admin We begin our EntraGoat use examples with Scenario 1, which we’ve named Misowned and Dangerous: An Owner’s Manual to Global Admin. This practical exercise showcases how legitimate application ownership in Microsoft Entra ID can be leveraged to escalate privileges and compromise a Global Administrator account—enabling complete tenant takeover.
+Starting with a compromised low-privileged user account, the attacker discovers ownership over an enterprise application (service principal) that is assigned a privileged role.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-08-10T00:14:26+03:00">
+    <meta property="article:modified_time" content="2025-08-10T00:14:26+03:00">
+      <meta property="og:image" content="http://localhost:1313/images/tomer.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/images/tomer.jpg">
+<meta name="twitter:title" content="EntraGoat Scenario 1: Application Ownership Compromise in Entra ID">
+<meta name="twitter:description" content="Misowned and dangerous: An Owner’s Manual to Global Admin
+We begin our EntraGoat use examples with Scenario 1, which we’ve named Misowned and Dangerous: An Owner’s Manual to Global Admin. This practical exercise showcases how legitimate application ownership in Microsoft Entra ID can be leveraged to escalate privileges and compromise a Global Administrator account—enabling complete tenant takeover.
+Starting with a compromised low-privileged user account, the attacker discovers ownership over an enterprise application (service principal) that is assigned a privileged role.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "EntraGoat Scenario 1: Application Ownership Compromise in Entra ID",
+      "item": "http://localhost:1313/posts/scenario1/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "EntraGoat Scenario 1: Application Ownership Compromise in Entra ID",
+  "name": "EntraGoat Scenario 1: Application Ownership Compromise in Entra ID",
+  "description": "Misowned and dangerous: An Owner’s Manual to Global Admin We begin our EntraGoat use examples with Scenario 1, which we’ve named Misowned and Dangerous: An Owner’s Manual to Global Admin. This practical exercise showcases how legitimate application ownership in Microsoft Entra ID can be leveraged to escalate privileges and compromise a Global Administrator account—enabling complete tenant takeover.\nStarting with a compromised low-privileged user account, the attacker discovers ownership over an enterprise application (service principal) that is assigned a privileged role.\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "Misowned and dangerous: An Owner’s Manual to Global Admin We begin our EntraGoat use examples with Scenario 1, which we’ve named Misowned and Dangerous: An Owner’s Manual to Global Admin. This practical exercise showcases how legitimate application ownership in Microsoft Entra ID can be leveraged to escalate privileges and compromise a Global Administrator account—enabling complete tenant takeover.\nStarting with a compromised low-privileged user account, the attacker discovers ownership over an enterprise application (service principal) that is assigned a privileged role.\nBy adding a client secret to the service principal, the attacker pivots into the application’s identity, then uses its role to reset the admin’s password and issue a Temporary Access Pass (TAP) to gain full interactive access to the Azure portal.\nThis scenario emphasizes the real-world consequences of application mismanagement and illustrates the difference in behavior, access boundaries, and risk exposure between delegated and app-only authentication flows.\nAttack path overview Initial foothold: – The attacker authenticates as a compromised finance user (david.martinez) with stolen credentials. Enumeration: Using native PowerShell and Microsoft Graph cmdlets, the attacker discovers the user owns a service principal named Finance Analytics Dashboard that is assigned the Privileged Authentication Administrator role. Privilege escalation: The attacker adds a client secret to the owned service principal and authenticates using app-only credentials, pivoting to a service principal identity. Account takeover: From the app-only context with the privileged role, the attacker resets the Global Administrator’s password or adds a TAP to bypass multifactor authentication (MFA), then logs in interactively and retrieves the flag, confirming full tenant compromise. Attack flow Figure 1 shows the flow of this attack.\nFigure 1. Attack flow compromising an EntraGoat global admin account\nWhy is understanding application ownership important? Every application in Entra ID has two distinct identities:\nApplication registration, a global definition object in the home tenant where the app was originally created. This object contains the app’s blueprint—OAuth2 permissions (scopes) that the app can request redirect URIs for sign-in flows, branding and publisher metadata, and more. This identity does not represent a live security principal in the tenant by itself. Service principal (SP), a local instance of the app in the tenant that acts as its security identity and enforces access control. A service principal is automatically created when a user in the tenant registers a new app, consents to an external app, and so on. The service principal identity is what Entra ID uses toassign roles, apply policies, and enforce permissions. It is also the authenticated identity when the app acts on its own (app-only context). Application ownership is a legitimate administrative feature. This design supports decentralized administration across large organizations, enabling teams to manage their own enterprise apps. It allows developers, automation processes, and service owners to manage the lifecycle and configuration of their applications. However, this feature becomes a liability when:\nApplications are granted privileged roles Ownership is assigned to regular users without governance Credential hygiene is weak or unmonitored Poorly governed service principals enable credential addition and app-only access, bypassing identity controls like MFA and Conditional Access.\nThis walkthrough highlights why attackers prioritize lateral movement using service principals in modern cloud environments and why defenders must understand the difference between delegated and app-only security contexts.\nHow to detect and defend against application ownership misuse Understanding and monitoring application ownership is not optional; it’s a foundational security control in any Entra ID environment. Application ownership grants the ability to manage credentials, configure permissions, and effectively control the identity of the application. Without visibility into app ownership and permission assignments, privilege escalation paths remain hidden from both defenders and auditors.\nDefenders should monitor and correlate:\nWhich applications exist in the tenant? Who owns them? What permissions or directory roles are they assigned? Do any unprivileged users own service principals with elevated access? Which applications are no longer in use and can be decommissioned? Semperis Directory Services Protector (DSP) helps close gaps in understanding these questions with multiple layers of defense starting with indicators of exposure (IOEs) and indicators of compromise (IOCs). These indicators automatically detect and alert on dangerous defaults and misconfigurations—such as overly permissive authorization policies for configuring applications, non-admins owning privileged service principals, and weak application security baselines.\nScenario deep dive: Step-by-step solution walkthrough Let’s take a look at the specific steps you’ll take to simulate application ownership misuse and understand how it enables Global Admin compromise.\nStep 1: Initial foothold We begin with the security context of a financial analyst, david.martinez (Figure 2) who entered his corporate credentials during a phishing campaign.\nFigure 2. Compromised credentials of a low-privileged user\nUsing the Connect-MgGraph cmdlet, we authenticate as the compromised user (Figure 3).\nFigure 3. Logging in with our stolen credentials\nTo understand our current capabilities, we start by inspecting the security context of the authenticated session (Figure 4).\nFigure 4. Security context of the authenticated session\nAn alternative and well-known method for authenticating as an Entra ID user and obtaining a JWT access token is to leverage automation tools such as BARK1. The following PowerShell snippet demonstrates how to acquire and use an access token via username/password authentication from the CLI:\n1 2 3 4 5 6 7 $userToken = Get-MSGraphTokenWithUsernamePassword -Username $UPN -Password $password -TenantID $tenantId $userAccessToken = $userToken.access\\_token $SecureToken = ConvertTo-SecureString $userAccessToken -AsPlainText -Force Connect-MgGraph -AccessToken $SecureToken BARK also includes functionality to decode the resulting JWT, exposing detailed session metadata such as delegated permissions (scp), directory roles (wids), authentication method (amr), and client information (app_displayname), as Figure 5 shows.\nFigure 5. Decoded session metadata\nThis decoding step is particularly useful for rapid privilege triage. For example, if the token was issued to a user with directory roles, the wids claim would directly list the assigned role GUIDs, such as the Global Administrator role that Figure 6 shows, without requiring additional Graph API enumeration.\nFigure 6. The Global Administrator UID revealed\nHowever, this walkthrough avoids relying on third-party tools or abstractions. All enumeration and exploitation steps are executed using native PowerShell and direct Graph API calls to ensure each phase of the attack path is fully transparent and technically explained.\n_____\nNote: By default, all authenticated users in Entra ID can query basic profile data of other users, and attributes like extensionAttribute1–15 aren’t classified as sensitive. As a result, the flag stored in the Admin’s profile can technically be retrieved immediately with the following API query:\n1 2 3 4 5 $uri = \"https://graph.microsoft.com/v1.0/users/EntraGoat-admin-s1@334brf.onmicrosoft.com?`$select=onPremisesExtensionAttributes\" $response = Invoke-MgGraphRequest -Uri $uri -Method GET $response.onPremisesExtensionAttributes.extensionAttribute1 This behavior is intentional. The goal of EntraGoat is not to hide the flag but to teach realistic privilege escalation techniques in Entra ID environments. Retrieving the flag via a direct API call is possible; but the real objective is to escalate privileges, access the Azure portal as the admin user, and **view the flag in their UI—**demonstrating full control over a Global Administrator identity. The flag is a gamified artifact, not the core goal.\n1 2 3 4 5 6 7 Invoke-MgGraphRequest -Uri 'https://graph.microsoft.com/v1.0/me?$select=id,userPrincipalName,onPremisesExtensionAttributes' | Select-Object @{n='UPN';e={$\\_.userPrincipalName}}, @{n='Id';e={$\\_.id}}, @{n='Flag';e={$\\_.onPremisesExtensionAttributes.extensionAttribute1}} Step 2: Enumeration Since this is the first scenario in the EntraGoat series, we’ll walk through the enumeration process and highlight foundational privilege escalation techniques. In our other scenarios, we’ll assume this baseline and focus directly on the core attack path, skipping the Capture The Flag-style reconnaissance steps.\nWith initial access to david.martinez, we begin searching for paths to privilege escalation. Our first task is to understand what access the compromised identity has.\nWe begin by checking whether the user is assigned any directory roles (Figure 7).:\nFigure 7. Checking user roles\nThe Get-MgRoleManagementDirectoryRoleAssignment cmdlet reveals no privileged roles, confirming that david.martinez has no elevated access by default. Next, we look at group memberships (Figure 8).\nFigure 8. Viewing our user’s group memberships\nThe user is only part of the default tenant group, which every Entra ID user is assigned for collaboration services like SharePoint or Teams. No privilege escalation path here either.\nWe also check whether david.martinez owns any groups, since group owners can add themselves as members and inherit the group’s privileges (such as assigned roles). This check returns empty as well (Figure 9).\nFigure 9. Checking our user’s group ownership\nHowever, querying for service principal ownership returns one result (Figure 10).\nFigure 10. Discovery that our user owns a service principal\ndavid.martinez owns the service principal Finance Analytics Dashboard. This is significant because service principal owners can manage credentials—including adding new secrets to authenticate as the service principal.\nLet’s check whether the Finance Analytics Dashboard service principal has any assigned permissions (Figure 11).\nFigure 11. Checking service principal assigned permissions\nNone are configured. Next, we check for any directory roles assigned to it (Figure 12).\nFigure 12. Checking for service principal directory roles\nWe see a role assignment, but it’s represented only by a GUID. Each built-in Entra ID role is represented by a GUID, which is global and the same in all Entra ID tenants. You can view all of the official built-in roles and their GUIDs here.\nTo resolve the GUID to a human-readable role name, we can pipe the output of Get-MgRoleManagementDirectoryRoleAssignment to Get-MgRoleManagementDirectoryRoleDefinition (Figure 13), which will translate each assigned role ID into its corresponding display name.\nFigure 13. Revealing a role’s display name\nPrivileged Authentication Administrator is a highly sensitive role in Entra ID. It allows the holder to manage authentication methods for all users, including resetting MFA settings, configuring FIDO2 and passwordless sign-in options, and modifying key policies that govern how users authenticate. That’s why an attacker, acting as its owner, would certainly want to add a client secret to it and use it to influence the Global Administrator account.\nNote: If you’ve followed the enumeration phase closely, you’ve likely noticed the verbosity and manual effort required when using native Microsoft Graph cmdlets. (What if we owned 5[0] Entra applications instead of 1?) This is one of the core limitations of relying solely on native tooling. Commands often return low-level data (such as GUIDs) that require additional queries to resolve into meaningful information.\nThis is exactly why many enumeration frameworks automate these processes. They abstract away repetitive queries and streamline the output, allowing faster privilege analysis and decision-making. For example, to improve usability we can write simple wrapper functions such as Find-OwnedServicePrincipals and Get-ServicePrincipalRoles that are designed to automate the discovery of SP ownership and resolve directory role assignments more efficiently:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 function Find-OwnedServicePrincipals { param([string]$UserId) # Get all service principals in tenant $allSPs = Get-MgServicePrincipal -All Write-Host \"Found $($allSPs.Count) service principals in tenant\" $ownedSPs = @() $checkCount = 0 # Check ownership of each service principal foreach ($sp in $allSPs) { $checkCount++ if ($checkCount % 50 -eq 0) { Write-Host \"Checked $checkCount/$($allSPs.Count) service principals...\" } try { $owners = Get-MgServicePrincipalOwner -ServicePrincipalId $sp.Id -ErrorAction SilentlyContinue if ($owners) { foreach ($owner in $owners) { if ($owner.Id -eq $UserId) { $ownedSPs += $sp Write-Host \"OWNED SERVICE PRINCIPAL FOUND!\" -ForegroundColor Red Write-Host \" Name: $($sp.DisplayName)\" -ForegroundColor Yellow Write-Host \" SP ID: $($sp.Id)\" -ForegroundColor Yellow Write-Host \" App ID: $($sp.AppId)\" -ForegroundColor Yellow break } } } } catch { continue } } return $ownedSPs } function Get-ServicePrincipalRoles { param([object]$ServicePrincipal) Write-Host \"Checking roles for: $($ServicePrincipal.DisplayName)\" # Check directory role assignments for the SP $roleAssignments = Get-MgRoleManagementDirectoryRoleAssignment -Filter \"principalId eq '$($ServicePrincipal.Id)'\" -ErrorAction SilentlyContinue $roles = @() if ($roleAssignments) { foreach ($assignment in $roleAssignments) { $roleDefinition = Get-MgRoleManagementDirectoryRoleDefinition -UnifiedRoleDefinitionId $assignment.RoleDefinitionId $roles += $roleDefinition Write-Host \" Role: $($roleDefinition.DisplayName)\" -ForegroundColor Cyan } } else { Write-Host \" No directory roles assigned\" } return $roles } Now, to discover all the service principals owned by the compromised user and enumerate their assigned roles, we can simply run Find-OwnedService Principals, as Figure 14 shows.\nFigure 14. Discovering owned service principals\nStep 3: Pivoting into the service principal’s context This step highlights the core reason why we created this scenario and positioned it first in the series. Service principals shape the landscape of privilege escalation in Entra ID. Lateral movement into a service principal’s security context and leveraging it to perform privileged operations is a fundamental technique every defender, attacker, and researcher that works with Entra ID should be familiar with.\nLet’s add a client secret to the Finance Analytics Dashboard service principal to establish backdoor access and authenticate as the SP:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 $secretDescription = \"EntraGoat-Secret-$(Get-Date -Format 'yyyyMMdd-HHmmss')\" $passwordCredential = @{ DisplayName = $secretDescription EndDateTime = (Get-Date).AddYears(1) } $newSecret = Add-MgServicePrincipalPassword -ServicePrincipalId $SP.Id -PasswordCredential $passwordCredential # Save the added secret details $clientSecret = $newSecret.SecretText Next, disconnect the current user session with Disconnect-MgGraph, construct the client credentials, and authenticate using the service principal’s identity via Connect-MgGraph:\n1 2 3 4 5 $secureSecret = ConvertTo-SecureString -String $clientSecret -AsPlainText -Force $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $SP.AppId, $secureSecret Connect-MgGraph -TenantId $tenantId -ClientSecretCredential $credential And indeed, now we are authenticated as the Finance Analytics Dashboard service principal (Figure 15).\nFigure 15. Demonstrating authentication as a service principal\nThe Get-MgContext response reveals information about how the current Microsoft Graph session is authenticated, which directly determines the security context, access level, and permission model that is applied. Let’s focus on the fields AuthType and TokenCredentialType as they expose core identity semantics in Entra ID.\nAfter authenticating as david.martinez, these values appeared as:\n1 2 3 AuthType : Delegated TokenCredentialType : InteractiveBrowser This indicates a delegated session, where the issued token represents a user identity. Access is governed by the user’s assigned roles and delegated permissions, and all operations are performed on behalf of the user. The session context is limited to what the user identity has access to as it inherits Conditional Access policies, MFA enforcement, and PIM constraints.\nIn contrast, an app-only context such as one initiated by a service principal using client credentials (AppId + Secret + TenantId) operates as a non-human identity. Any client (script, background job, daemon) using those credentials can authenticate as the app and invoke Microsoft Graph APIs based on its application permissions, regardless of user context. Conditional Access policies, MFA, and PIM are not applicable or enforced in this flow.\nThis distinction is foundational in identity security design and explains why API behavior, access scopes, and token privileges differ under the same cmdlets, depending on session context.\nAnd as expected, this distinction has a big impact on attack surface and abuse potential. Delegated flows are constrained by user context while App-only flows operate with service-level trust and often with broader and less-controlled privilege boundaries. For attackers, compromising an app secret or certificate often results in persistent, high-privilege access that bypasses identity-centric enforcement mechanisms.\nStep 4: Account takeover—signing in as the global admin Now that we’ve authenticated as an identity with the Privileged Authentication Administrator role, we have the ability to reset passwords (Figure 16) for any user in the tenant, including the Global Administrator.\nFigure 16: Resetting the Admin password\nWith this level of access, we can also assign a TAP (Figure 17) as an authentication method, enabling us to bypass MFA and sign in directly to the Azure Portal:\nFigure 17. Assigning a TAP for authentication\nNext, we log in with the TAP (Figure 18).\nFigure 18. Logging in with the new TAP\nWe then retrieve the scenario flag (Figure 19).\nFigure 19. The flag is captured\nOnce the scenario is completed, we execute the cleanup script to restore the EntraGoat tenant to its original state (Figure 20).\nFigure 20. EntraGoat cleanup sets us up for our next scenario\nKnow your weakest link This scenario demonstrates how seemingly legitimate and common configurations, such as assigning application ownership to a standard user, can open the door to full tenant compromise when paired with privileged roles.\nBy leveraging ownership over a service principal, attackers can escalate privileges, bypass user-centric defenses like MFA and Conditional Access, and ultimately gain Global Administrator access through an app-only flow.\nThis exercise underscores the critical importance of strong governance around application permissions, service principal ownership, and role assignments. In modern cloud environments, service principals are often the weakest link, and understanding their dual identity model, access boundaries, and abuse potential is essential for both attackers and defenders.\nEntraGoat’s Scenario 1 sets the foundation for further exploration—and our next scenarios. So keep on hacking!\nTake on your next EntraGoat challenge Endnote 1 https://github.com/BloodHoundAD/BARK\nDisclaimer This content is provided for educational and informational purposes only. It is intended to promote awareness and responsible remediation of security vulnerabilities that may exist on systems you own or are authorized to test. Unauthorized use of this information for malicious purposes, exploitation, or unlawful access is strictly prohibited. We do not endorse or condone any illegal activity and disclaims any liability arising from misuse of the material. Additionally, We do not guarantee the accuracy or completeness of the content and assumes no liability for any damages resulting from its use.\n",
+  "wordCount" : "2893",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/images/tomer.jpg","datePublished": "2025-08-10T00:14:26+03:00",
+  "dateModified": "2025-08-10T00:14:26+03:00",
+  "author":[{
+    "@type": "Person",
+    "name": "Tomer Nahum"
+  }, {
+    "@type": "Person",
+    "name": "Jonathan Elkabas"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/scenario1/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TomerN",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="TomerN (Alt + H)">TomerN</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/opensourceprojects/" title="Open Source Projects">
+                    <span>Open Source Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      EntraGoat Scenario 1: Application Ownership Compromise in Entra ID
+    </h1>
+    <div class="post-meta"><span title='2025-08-10 00:14:26 +0300 IDT'>August 10, 2025</span>&nbsp;·&nbsp;14 min&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#misowned-and-dangerous-an-owners-manual-to-global-admin" aria-label="Misowned and dangerous: An Owner’s Manual to Global Admin">Misowned and dangerous: An Owner’s Manual to Global Admin</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#attack-path-overview" aria-label="Attack path overview">Attack path overview</a></li>
+                <li>
+                    <a href="#attack-flow" aria-label="Attack flow">Attack flow</a></li></ul>
+                    
+                <li>
+                    <a href="#why-is-understanding-application-ownership-important" aria-label="Why is understanding application ownership important?">Why is understanding application ownership important?</a></li>
+                <li>
+                    <a href="#how-to-detect-and-defend-against-application-ownership-misuse" aria-label="How to detect and defend against application ownership misuse">How to detect and defend against application ownership misuse</a></li>
+                <li>
+                    <a href="#scenario-deep-dive-step-by-step-solution-walkthrough" aria-label="Scenario deep dive: Step-by-step solution walkthrough">Scenario deep dive: Step-by-step solution walkthrough</a><ul>
+                        
+                <li>
+                    <a href="#step-1-initial-foothold" aria-label="Step 1: Initial foothold">Step 1: Initial foothold</a></li>
+                <li>
+                    <a href="#step-2-enumeration" aria-label="Step 2: Enumeration">Step 2: Enumeration</a></li>
+                <li>
+                    <a href="#step-3-pivoting-into-the-service-principals-context" aria-label="Step 3: Pivoting into the service principal’s context">Step 3: Pivoting into the service principal’s context</a></li>
+                <li>
+                    <a href="#step-4-account-takeoversigning-in-as-the-global-admin" aria-label="Step 4: Account takeover—signing in as the global admin">Step 4: Account takeover—signing in as the global admin</a></li></ul>
+                </li>
+                <li>
+                    <a href="#know-your-weakest-link" aria-label="Know your weakest link">Know your weakest link</a></li>
+                <li>
+                    <a href="#take-on-your-next-entragoat-challenge" aria-label="Take on your next EntraGoat challenge">Take on your next EntraGoat challenge</a></li>
+                <li>
+                    <a href="#endnote" aria-label="Endnote">Endnote</a></li>
+                <li>
+                    <a href="#disclaimer" aria-label="Disclaimer">Disclaimer</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="misowned-and-dangerous-an-owners-manual-to-global-admin">Misowned and dangerous: An Owner’s Manual to Global Admin<a hidden class="anchor" aria-hidden="true" href="#misowned-and-dangerous-an-owners-manual-to-global-admin">#</a></h1>
+<p>We begin our EntraGoat use examples with Scenario 1, which we’ve named <strong>Misowned and Dangerous: An Owner’s Manual to Global Admin</strong>. This practical exercise showcases how legitimate application ownership in Microsoft Entra ID can be leveraged to escalate privileges and compromise a Global Administrator account—enabling complete tenant takeover.</p>
+<p>Starting with a compromised low-privileged user account, the attacker discovers ownership over an enterprise application (service principal) that is assigned a privileged role.</p>
+<p>By adding a client secret to the service principal, the attacker pivots into the application’s identity, then uses its role to reset the admin’s password and issue a Temporary Access Pass (TAP) to gain full interactive access to the Azure portal.</p>
+<p>This scenario emphasizes the real-world consequences of application mismanagement and illustrates the difference in behavior, access boundaries, and risk exposure between delegated and app-only authentication flows.</p>
+<h3 id="attack-path-overview">Attack path overview<a hidden class="anchor" aria-hidden="true" href="#attack-path-overview">#</a></h3>
+<ol>
+<li><strong>Initial foothold:</strong> – The attacker authenticates as a compromised finance user (david.martinez) with stolen credentials.</li>
+<li><strong>Enumeration</strong>: Using native PowerShell and Microsoft Graph cmdlets, the attacker discovers the user owns a service principal named Finance Analytics Dashboard that is assigned the Privileged Authentication Administrator role.</li>
+<li><strong>Privilege escalation:</strong> The attacker adds a client secret to the owned service principal and authenticates using app-only credentials, pivoting to a service principal identity.</li>
+<li><strong>Account takeover</strong>: From the app-only context with the privileged role, the attacker resets the Global Administrator’s password or adds a TAP to bypass multifactor authentication (MFA), then logs in interactively and retrieves the flag, confirming full tenant compromise.</li>
+</ol>
+<h3 id="attack-flow">Attack flow<a hidden class="anchor" aria-hidden="true" href="#attack-flow">#</a></h3>
+<p><em>Figure 1</em> shows the flow of this attack.</p>
+<p><img loading="lazy" src="/posts/scenario1/image.png"></p>
+<p><em>Figure 1. Attack flow compromising an EntraGoat global admin account</em></p>
+<h2 id="why-is-understanding-application-ownership-important">Why is understanding application ownership important?<a hidden class="anchor" aria-hidden="true" href="#why-is-understanding-application-ownership-important">#</a></h2>
+<p>Every application in Entra ID has <strong>two distinct identities</strong>:</p>
+<ol>
+<li><strong>Application registration</strong>, a global definition object in the home tenant where the app was originally created. This object contains the app’s blueprint—OAuth2 permissions (scopes) that the app can request redirect URIs for sign-in flows, branding and publisher metadata, and more. This identity does not represent a live security principal in the tenant by itself.</li>
+<li><strong>Service principal</strong> <strong>(SP)</strong>, a local instance of the app in the tenant that acts as its <strong>security identity</strong> and enforces access control. A service principal is automatically created when a user in the tenant registers a new app, consents to an external app, and so on. The service principal identity is what Entra ID uses toassign roles, apply policies, and enforce permissions. It is also <strong>the authenticated identity when the app acts on its own (app-only context).</strong></li>
+</ol>
+<p><strong>Application ownership is a</strong> <strong>legitimate administrative feature</strong>. This design supports decentralized administration across large organizations, enabling teams to manage their own enterprise apps. It allows developers, automation processes, and service owners to manage the lifecycle and configuration of their applications. However, this feature becomes a liability when:</p>
+<ul>
+<li>Applications are granted privileged roles</li>
+<li>Ownership is assigned to regular users without governance</li>
+<li>Credential hygiene is weak or unmonitored</li>
+</ul>
+<p>Poorly governed service principals enable credential addition and app-only access, bypassing identity controls like MFA and Conditional Access.</p>
+<p><strong>This walkthrough highlights why attackers prioritize lateral movement using service principals in modern cloud environments and why defenders must understand the difference between delegated and app-only security contexts.</strong></p>
+<h2 id="how-to-detect-and-defend-against-application-ownership-misuse">How to detect and defend against application ownership misuse<a hidden class="anchor" aria-hidden="true" href="#how-to-detect-and-defend-against-application-ownership-misuse">#</a></h2>
+<p>Understanding and monitoring application ownership is not optional; it’s a foundational security control in any Entra ID environment. Application ownership grants the ability to manage credentials, configure permissions, and effectively <strong>control the identity of the application</strong>. Without visibility into app ownership and permission assignments, privilege escalation paths remain hidden from both defenders and auditors.</p>
+<p>Defenders should monitor and correlate:</p>
+<ul>
+<li>Which applications exist in the tenant?</li>
+<li>Who owns them?</li>
+<li>What permissions or directory roles are they assigned?</li>
+<li>Do any unprivileged users own service principals with elevated access?</li>
+<li>Which applications are no longer in use and can be decommissioned?</li>
+</ul>
+<p><strong>Semperis <a href="https://www.semperis.com/active-directory-security/">Directory Services Protector (DSP)</a></strong> helps close gaps in understanding these questions with multiple layers of defense starting with indicators of exposure (IOEs) and indicators of compromise (IOCs). These indicators automatically detect and alert on dangerous defaults and misconfigurations—such as overly permissive authorization policies for configuring applications, non-admins owning privileged service principals, and weak application security baselines.</p>
+<h2 id="scenario-deep-dive-step-by-step-solution-walkthrough">Scenario deep dive: Step-by-step solution walkthrough<a hidden class="anchor" aria-hidden="true" href="#scenario-deep-dive-step-by-step-solution-walkthrough">#</a></h2>
+<p>Let’s take a look at the specific steps you’ll take to simulate application ownership misuse and understand how it enables Global Admin compromise.</p>
+<h3 id="step-1-initial-foothold">Step 1: Initial foothold<a hidden class="anchor" aria-hidden="true" href="#step-1-initial-foothold">#</a></h3>
+<p>We begin with the security context of a financial analyst, david.martinez (<em>Figure 2</em>) who entered his corporate credentials during a phishing campaign.</p>
+<p><img loading="lazy" src="/posts/scenario1/image%201.png"></p>
+<p><em>Figure 2. Compromised credentials of a low-privileged user</em></p>
+<p>Using the Connect-MgGraph cmdlet, we authenticate as the compromised user (<em>Figure 3</em>).</p>
+<p><img loading="lazy" src="/posts/scenario1/image%202.png"></p>
+<p><em>Figure 3. Logging in with our stolen credentials</em></p>
+<p>To understand our current capabilities, we start by inspecting the security context of the authenticated session (<em>Figure 4</em>).</p>
+<p><img loading="lazy" src="/posts/scenario1/image%203.png"></p>
+<p><em>Figure 4. Security context of the authenticated session</em></p>
+<p>An alternative and well-known method for authenticating as an Entra ID user and obtaining a JWT access token is to leverage automation tools such as BARK1. The following PowerShell snippet demonstrates how to acquire and use an access token via username/password authentication from the CLI:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nv">$userToken</span> <span class="p">=</span> <span class="nb">Get-MSGraphTokenWithUsernamePassword</span> <span class="n">-Username</span> <span class="nv">$UPN</span> <span class="n">-Password</span> <span class="nv">$password</span> <span class="n">-TenantID</span> <span class="nv">$tenantId</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$userAccessToken</span> <span class="p">=</span> <span class="nv">$userToken</span><span class="p">.</span><span class="n">access</span><span class="p">\</span><span class="n">_token</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$SecureToken</span> <span class="p">=</span> <span class="nb">ConvertTo-SecureString</span> <span class="nv">$userAccessToken</span> <span class="n">-AsPlainText</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">Connect-MgGraph</span> <span class="n">-AccessToken</span> <span class="nv">$SecureToken</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>BARK also includes functionality to decode the resulting JWT, exposing detailed session metadata such as delegated permissions (scp), directory roles (wids), authentication method (amr), and client information (app_displayname), as <em>Figure 5</em> shows.</p>
+<p><img loading="lazy" src="/posts/scenario1/image%204.png"></p>
+<p><em>Figure 5. Decoded session metadata</em></p>
+<p>This decoding step is particularly useful for rapid privilege triage. For example, if the token was issued to a user with directory roles, the wids claim would directly list the assigned role GUIDs, such as the Global Administrator role that <em>Figure 6</em> shows, without requiring additional Graph API enumeration.</p>
+<p><img loading="lazy" src="/posts/scenario1/image%205.png"></p>
+<p><em>Figure 6. The Global Administrator UID revealed</em></p>
+<p>However, this walkthrough avoids relying on third-party tools or abstractions. All enumeration and exploitation steps are executed using native PowerShell and direct Graph API calls to ensure each phase of the attack path is fully transparent and technically explained.</p>
+<p>_____</p>
+<p><strong>Note:</strong> By default, all authenticated users in Entra ID can query basic profile data of other users, and attributes like extensionAttribute1–15 aren’t classified as sensitive. As a result, the flag stored in the Admin’s profile can technically be retrieved immediately with the following API query:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nv">$uri</span> <span class="p">=</span> <span class="s2">&#34;https://graph.microsoft.com/v1.0/users/EntraGoat-admin-s1@334brf.onmicrosoft.com?</span><span class="se">`$</span><span class="s2">select=onPremisesExtensionAttributes&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$response</span> <span class="p">=</span> <span class="nb">Invoke-MgGraphRequest</span> <span class="n">-Uri</span> <span class="nv">$uri</span> <span class="n">-Method</span> <span class="n">GET</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$response</span><span class="p">.</span><span class="py">onPremisesExtensionAttributes</span><span class="p">.</span><span class="py">extensionAttribute1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This behavior is intentional. The goal of EntraGoat is not to hide the flag but to teach realistic privilege escalation techniques in Entra ID environments. Retrieving the flag via a direct API call is possible; but the real objective is to escalate privileges, access the Azure portal as the admin user, and **view the flag in their UI—**demonstrating full control over a Global Administrator identity. The flag is a gamified artifact, not the core goal.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">Invoke-MgGraphRequest</span> <span class="n">-Uri</span> <span class="s1">&#39;https://graph.microsoft.com/v1.0/me?$select=id,userPrincipalName,onPremisesExtensionAttributes&#39;</span> <span class="p">|</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">Select-Object</span> <span class="vm">@</span><span class="p">{</span><span class="n">n</span><span class="p">=</span><span class="s1">&#39;UPN&#39;</span><span class="p">;</span><span class="n">e</span><span class="p">={$\</span><span class="n">_</span><span class="p">.</span><span class="n">userPrincipalName</span><span class="p">}},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                  <span class="vm">@</span><span class="p">{</span><span class="n">n</span><span class="p">=</span><span class="s1">&#39;Id&#39;</span><span class="p">;</span><span class="n">e</span><span class="p">={$\</span><span class="n">_</span><span class="p">.</span><span class="n">id</span><span class="p">}},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                  <span class="vm">@</span><span class="p">{</span><span class="n">n</span><span class="p">=</span><span class="s1">&#39;Flag&#39;</span><span class="p">;</span><span class="n">e</span><span class="p">={$\</span><span class="n">_</span><span class="p">.</span><span class="py">onPremisesExtensionAttributes</span><span class="p">.</span><span class="n">extensionAttribute1</span><span class="p">}}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="step-2-enumeration">Step 2: Enumeration<a hidden class="anchor" aria-hidden="true" href="#step-2-enumeration">#</a></h3>
+<p>Since this is the first scenario in the EntraGoat series, we’ll walk through <strong>the enumeration process</strong> and highlight foundational privilege escalation techniques. In our other scenarios, we’ll assume this baseline and focus directly on the core attack path, skipping the Capture The Flag-style reconnaissance steps.</p>
+<p>With initial access to david.martinez, we begin searching for paths to privilege escalation. Our first task is to understand <strong>what access the compromised identity has</strong>.</p>
+<p>We begin by checking whether the user is assigned any directory roles (<em>Figure 7</em>).:</p>
+<p><img loading="lazy" src="/posts/scenario1/image%206.png"></p>
+<p><em>Figure 7. Checking user roles</em></p>
+<p>The Get-MgRoleManagementDirectoryRoleAssignment cmdlet reveals no privileged roles, confirming that david.martinez has no elevated access by default. Next, we look at group memberships (<em>Figure 8</em>).</p>
+<p><img loading="lazy" src="/posts/scenario1/image%207.png"></p>
+<p><em>Figure 8. Viewing our user’s group memberships</em></p>
+<p>The user is only part of the default tenant group, which every Entra ID user is assigned for collaboration services like SharePoint or Teams. No privilege escalation path here either.</p>
+<p>We also check whether david.martinez owns any groups, since group owners can add themselves as members and inherit the group’s privileges (such as assigned roles). This check returns empty as well (<em>Figure 9</em>).</p>
+<p><img loading="lazy" src="/posts/scenario1/image%208.png"></p>
+<p><em>Figure 9. Checking our user’s group ownership</em></p>
+<p>However, querying for service principal ownership returns one result (<em>Figure 10</em>).</p>
+<p><img alt="A screen shot of a computer  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%209.png"></p>
+<p><em>Figure 10. Discovery that our user owns a service principal</em></p>
+<p>david.martinez owns the service principal Finance Analytics Dashboard. This is significant because service principal owners can manage credentials—including adding new secrets to <strong>authenticate as the service principal.</strong></p>
+<p>Let&rsquo;s check whether the Finance Analytics Dashboard service principal has any assigned permissions (<em>Figure 11</em>).</p>
+<p><img loading="lazy" src="/posts/scenario1/image%2010.png"></p>
+<p><em>Figure 11. Checking service principal assigned permissions</em></p>
+<p>None are configured. Next, we check for any directory roles assigned to it (<em>Figure 12</em>).</p>
+<p><img loading="lazy" src="/posts/scenario1/image%2011.png"></p>
+<p><em>Figure 12. Checking for service principal directory roles</em></p>
+<p>We see a role assignment, but it&rsquo;s represented only by a GUID. Each built-in Entra ID role is represented by a GUID, which is global and the same in all Entra ID tenants. You can view all of the official built-in roles and their GUIDs <a href="https://docs.azure.cn/en-us/entra/identity/role-based-access-control/permissions-reference">here</a>.</p>
+<p>To resolve the GUID to a human-readable role name, we can pipe the output of Get-MgRoleManagementDirectoryRoleAssignment to Get-MgRoleManagementDirectoryRoleDefinition (<em>Figure 13</em>), which will translate each assigned role ID into its corresponding display name.</p>
+<p><img loading="lazy" src="/posts/scenario1/image%2012.png"></p>
+<p><em>Figure 13. Revealing a role’s display name</em></p>
+<p>Privileged Authentication Administrator is a highly sensitive role in Entra ID. It allows the holder to manage authentication methods for all users, including resetting MFA settings, configuring FIDO2 and passwordless sign-in options, and modifying key policies that govern how users authenticate. That’s why an attacker, acting as its owner, would certainly want to add a client secret to it and use it to influence the Global Administrator account.</p>
+<p><strong>Note:</strong> If you&rsquo;ve followed the enumeration phase closely, you&rsquo;ve likely noticed the verbosity and manual effort required when using native Microsoft Graph cmdlets. (What if we owned 5[0] Entra applications instead of 1?) This is one of the core limitations of relying solely on native tooling. Commands often return low-level data (such as GUIDs) that require additional queries to resolve into meaningful information.</p>
+<p>This is exactly why many enumeration frameworks automate these processes. They abstract away repetitive queries and streamline the output, allowing <strong>faster privilege analysis</strong> and <strong>decision-making</strong>. For example, to improve usability we can write simple wrapper functions such as Find-OwnedServicePrincipals and Get-ServicePrincipalRoles that are designed to automate the discovery of SP ownership and resolve directory role assignments more efficiently:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Find-OwnedServicePrincipals</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">param</span><span class="p">([</span><span class="no">string</span><span class="p">]</span><span class="nv">$UserId</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c"># Get all service principals in tenant</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nv">$allSPs</span> <span class="p">=</span> <span class="nb">Get-MgServicePrincipal</span> <span class="n">-All</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">Write-Host</span> <span class="s2">&#34;Found </span><span class="p">$(</span><span class="nv">$allSPs</span><span class="p">.</span><span class="n">Count</span><span class="p">)</span><span class="s2"> service principals in tenant&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nv">$ownedSPs</span> <span class="p">=</span> <span class="vm">@</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nv">$checkCount</span> <span class="p">=</span> <span class="mf">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c"># Check ownership of each service principal</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$sp</span> <span class="k">in</span> <span class="nv">$allSPs</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nv">$checkCount</span><span class="p">++</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nv">$checkCount</span> <span class="p">%</span> <span class="mf">50</span> <span class="o">-eq</span> <span class="mf">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="nb">Write-Host</span> <span class="s2">&#34;Checked </span><span class="nv">$checkCount</span><span class="s2">/</span><span class="p">$(</span><span class="nv">$allSPs</span><span class="p">.</span><span class="n">Count</span><span class="p">)</span><span class="s2"> service principals...&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="nv">$owners</span> <span class="p">=</span> <span class="nb">Get-MgServicePrincipalOwner</span> <span class="n">-ServicePrincipalId</span> <span class="nv">$sp</span><span class="p">.</span><span class="py">Id</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nv">$owners</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="k">foreach</span> <span class="p">(</span><span class="nv">$owner</span> <span class="k">in</span> <span class="nv">$owners</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="p">(</span><span class="nv">$owner</span><span class="p">.</span><span class="py">Id</span> <span class="o">-eq</span> <span class="nv">$UserId</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                        <span class="nv">$ownedSPs</span> <span class="p">+=</span> <span class="nv">$sp</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                        <span class="nb">Write-Host</span> <span class="s2">&#34;OWNED SERVICE PRINCIPAL FOUND!&#34;</span> <span class="n">-ForegroundColor</span> <span class="n">Red</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                        <span class="nb">Write-Host</span> <span class="s2">&#34;   Name: </span><span class="p">$(</span><span class="nv">$sp</span><span class="p">.</span><span class="n">DisplayName</span><span class="p">)</span><span class="s2">&#34;</span> <span class="n">-ForegroundColor</span> <span class="n">Yellow</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                        <span class="nb">Write-Host</span> <span class="s2">&#34;   SP ID: </span><span class="p">$(</span><span class="nv">$sp</span><span class="p">.</span><span class="n">Id</span><span class="p">)</span><span class="s2">&#34;</span> <span class="n">-ForegroundColor</span> <span class="n">Yellow</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                        <span class="nb">Write-Host</span> <span class="s2">&#34;   App ID: </span><span class="p">$(</span><span class="nv">$sp</span><span class="p">.</span><span class="n">AppId</span><span class="p">)</span><span class="s2">&#34;</span> <span class="n">-ForegroundColor</span> <span class="n">Yellow</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                        <span class="k">break</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$ownedSPs</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Get-ServicePrincipalRoles</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">param</span><span class="p">([</span><span class="no">object</span><span class="p">]</span><span class="nv">$ServicePrincipal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">Write-Host</span> <span class="s2">&#34;Checking roles for: </span><span class="p">$(</span><span class="nv">$ServicePrincipal</span><span class="p">.</span><span class="n">DisplayName</span><span class="p">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c"># Check directory role assignments for the SP</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nv">$roleAssignments</span> <span class="p">=</span> <span class="nb">Get-MgRoleManagementDirectoryRoleAssignment</span> <span class="n">-Filter</span> <span class="s2">&#34;principalId eq &#39;</span><span class="p">$(</span><span class="nv">$ServicePrincipal</span><span class="p">.</span><span class="n">Id</span><span class="p">)</span><span class="s2">&#39;&#34;</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nv">$roles</span> <span class="p">=</span> <span class="vm">@</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$roleAssignments</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$assignment</span> <span class="k">in</span> <span class="nv">$roleAssignments</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="nv">$roleDefinition</span> <span class="p">=</span> <span class="nb">Get-MgRoleManagementDirectoryRoleDefinition</span> <span class="n">-UnifiedRoleDefinitionId</span> <span class="nv">$assignment</span><span class="p">.</span><span class="py">RoleDefinitionId</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="nv">$roles</span> <span class="p">+=</span> <span class="nv">$roleDefinition</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="nb">Write-Host</span> <span class="s2">&#34;   Role: </span><span class="p">$(</span><span class="nv">$roleDefinition</span><span class="p">.</span><span class="n">DisplayName</span><span class="p">)</span><span class="s2">&#34;</span> <span class="n">-ForegroundColor</span> <span class="n">Cyan</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nb">Write-Host</span> <span class="s2">&#34;   No directory roles assigned&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$roles</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now, to discover all the service principals owned by the compromised user and enumerate their assigned roles, we can simply run Find-OwnedService Principals, as <em>Figure 14</em> shows.</p>
+<p><img alt="A screen shot of a computer  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%2013.png"></p>
+<p><em>Figure 14. Discovering owned service principals</em></p>
+<h3 id="step-3-pivoting-into-the-service-principals-context">Step 3: Pivoting into the service principal’s context<a hidden class="anchor" aria-hidden="true" href="#step-3-pivoting-into-the-service-principals-context">#</a></h3>
+<p>This step highlights the core reason why we created this scenario and positioned it first in the series. <strong>Service principals shape the landscape of privilege escalation in Entra ID</strong>. Lateral movement into a service principal’s security context and leveraging it to perform privileged operations is a fundamental technique every defender, attacker, and researcher that works with Entra ID should be familiar with.</p>
+<p>Let’s add a client secret to the Finance Analytics Dashboard service principal to establish backdoor access and authenticate as the SP:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nv">$secretDescription</span> <span class="p">=</span> <span class="s2">&#34;EntraGoat-Secret-</span><span class="p">$(</span><span class="nb">Get-Date</span> <span class="n">-Format</span> <span class="s1">&#39;yyyyMMdd-HHmmss&#39;</span><span class="p">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$passwordCredential</span> <span class="p">=</span> <span class="vm">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">DisplayName</span> <span class="p">=</span> <span class="nv">$secretDescription</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">EndDateTime</span> <span class="p">=</span> <span class="p">(</span><span class="nb">Get-Date</span><span class="p">).</span><span class="py">AddYears</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$newSecret</span> <span class="p">=</span> <span class="nb">Add-MgServicePrincipalPassword</span> <span class="n">-ServicePrincipalId</span> <span class="nv">$SP</span><span class="p">.</span><span class="py">Id</span> <span class="n">-PasswordCredential</span> <span class="nv">$passwordCredential</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># Save the added secret details</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$clientSecret</span> <span class="p">=</span> <span class="nv">$newSecret</span><span class="p">.</span><span class="py">SecretText</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Next, disconnect the current user session with Disconnect-MgGraph, construct the client credentials, and authenticate using the service principal’s identity via Connect-MgGraph:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nv">$secureSecret</span> <span class="p">=</span> <span class="nb">ConvertTo-SecureString</span> <span class="n">-String</span> <span class="nv">$clientSecret</span> <span class="n">-AsPlainText</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">$credential</span> <span class="p">=</span> <span class="nb">New-Object</span> <span class="n">-TypeName</span> <span class="n">System</span><span class="p">.</span><span class="py">Management</span><span class="p">.</span><span class="py">Automation</span><span class="p">.</span><span class="py">PSCredential</span> <span class="n">-ArgumentList</span> <span class="nv">$SP</span><span class="p">.</span><span class="n">AppId</span><span class="p">,</span> <span class="nv">$secureSecret</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">Connect-MgGraph</span> <span class="n">-TenantId</span> <span class="nv">$tenantId</span> <span class="n">-ClientSecretCredential</span> <span class="nv">$credential</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>And indeed, now we are authenticated as the Finance Analytics Dashboard service principal (<em>Figure 15</em>).</p>
+<p><img alt="A screenshot of a computer program  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%2014.png"></p>
+<p><em>Figure 15. Demonstrating authentication as a service principal</em></p>
+<p>The Get-MgContext response reveals information about <strong>how the current Microsoft Graph session is authenticated</strong>, which directly determines the <strong>security context, access level, and permission model</strong> that is applied. Let’s focus on the fields AuthType and TokenCredentialType as they expose core identity semantics in Entra ID.</p>
+<p>After authenticating as david.martinez, these values appeared as:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">AuthType</span>            <span class="err">:</span> <span class="n">Delegated</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">TokenCredentialType</span> <span class="err">:</span> <span class="n">InteractiveBrowser</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This indicates a <strong>delegated session</strong>, where the issued token represents a user identity. Access is governed by the user&rsquo;s assigned roles and delegated permissions, and all operations are performed <strong>on behalf of the user</strong>. The session context is limited to what the user identity has access to as it inherits Conditional Access policies, MFA enforcement, and PIM constraints.</p>
+<p>In contrast, an <strong>app-only context</strong> such as one initiated by a service principal using client credentials (AppId + Secret + TenantId) operates as a <strong>non-human identity</strong>. Any client (script, background job, daemon) using those credentials can authenticate as the app and invoke Microsoft Graph APIs based on its <strong>application permissions</strong>, regardless of user context. Conditional Access policies, MFA, and PIM are not applicable or enforced in this flow.</p>
+<p>This distinction is foundational in identity security design and explains why API behavior, access scopes, and token privileges differ under the same cmdlets, depending on session context.</p>
+<p>And as expected, this distinction has a big impact on attack surface and abuse potential. Delegated flows are constrained by user context while App-only flows operate with <strong>service-level trust</strong> and often with broader and less-controlled privilege boundaries. For attackers, compromising an app secret or certificate often results in persistent, high-privilege access that bypasses identity-centric enforcement mechanisms.</p>
+<h3 id="step-4-account-takeoversigning-in-as-the-global-admin">Step 4: <strong>Account takeover—s</strong>igning in as the global admin<a hidden class="anchor" aria-hidden="true" href="#step-4-account-takeoversigning-in-as-the-global-admin">#</a></h3>
+<p>Now that we&rsquo;ve authenticated as an identity with the Privileged Authentication Administrator role, we have the ability to reset passwords (<em>Figure 16</em>) for any user in the tenant, including the Global Administrator.</p>
+<p><img alt="A computer screen shot of text  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%2015.png"></p>
+<p><em>Figure 16: Resetting the Admin password</em></p>
+<p>With this level of access, we can also assign a <strong>TAP</strong> (<em>Figure 17</em>) as an authentication method, enabling us to bypass MFA and sign in directly to the Azure Portal:</p>
+<p><img alt="A black background with blue and yellow text  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%2016.png"></p>
+<p><em>Figure 17. Assigning a TAP for authentication</em></p>
+<p>Next, we log in with the TAP (<em>Figure 18</em>).</p>
+<p><img alt="A screenshot of a login page  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%2017.png"></p>
+<p><em>Figure 18. Logging in with the new TAP</em></p>
+<p>We then retrieve the scenario flag (<em>Figure 19</em>).</p>
+<p><img alt="A screenshot of a computer  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%2018.png"></p>
+<p><em>Figure 19. The flag is captured</em></p>
+<p>Once the scenario is completed, we execute the cleanup script to restore the EntraGoat tenant to its original state (<em>Figure 20</em>).</p>
+<p><img alt="A screenshot of a computer screen  AI-generated content may be incorrect." loading="lazy" src="/posts/scenario1/image%2019.png"></p>
+<p><em>Figure 20. EntraGoat cleanup sets us up for our next scenario</em></p>
+<h2 id="know-your-weakest-link">Know your weakest link<a hidden class="anchor" aria-hidden="true" href="#know-your-weakest-link">#</a></h2>
+<p>This scenario demonstrates how seemingly legitimate and common configurations, such as assigning application ownership to a standard user, can open the door to full tenant compromise when paired with privileged roles.</p>
+<p>By leveraging ownership over a service principal, attackers can escalate privileges, bypass user-centric defenses like MFA and Conditional Access, and ultimately gain Global Administrator access through an app-only flow.</p>
+<p>This exercise underscores the <strong>critical importance of strong governance around application permissions, service principal ownership, and role assignments</strong>. In modern cloud environments, service principals are often the weakest link, and understanding their dual identity model, access boundaries, and abuse potential is essential for both attackers and defenders.</p>
+<p>EntraGoat’s Scenario 1 sets the foundation for further exploration—and our next scenarios. So keep on hacking!</p>
+<h2 id="take-on-your-next-entragoat-challenge">Take on your next EntraGoat challenge<a hidden class="anchor" aria-hidden="true" href="#take-on-your-next-entragoat-challenge">#</a></h2>
+<h2 id="endnote">Endnote<a hidden class="anchor" aria-hidden="true" href="#endnote">#</a></h2>
+<p>1 <a href="https://github.com/BloodHoundAD/BARK">https://github.com/BloodHoundAD/BARK</a></p>
+<h2 id="disclaimer">Disclaimer<a hidden class="anchor" aria-hidden="true" href="#disclaimer">#</a></h2>
+<p>This content is provided for educational and informational purposes only. It is intended to promote awareness and responsible remediation of security vulnerabilities that may exist on systems you own or are authorized to test. Unauthorized use of this information for malicious purposes, exploitation, or unlawful access is strictly prohibited. We do not endorse or condone any illegal activity and disclaims any liability arising from misuse of the material. Additionally, We do not guarantee the accuracy or completeness of the content and assumes no liability for any damages resulting from its use.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/scenario2/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>EntraGoat Scenario 2: Exploiting App-Only Graph Permissions in Entra ID</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/gettingstarted/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Getting Started with EntraGoat: Breaking Entra ID the Smart Way</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share EntraGoat Scenario 1: Application Ownership Compromise in Entra ID on x"
+            href="https://x.com/intent/tweet/?text=EntraGoat%20Scenario%201%3a%20Application%20Ownership%20Compromise%20in%20Entra%20ID&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share EntraGoat Scenario 1: Application Ownership Compromise in Entra ID on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f&amp;title=EntraGoat%20Scenario%201%3a%20Application%20Ownership%20Compromise%20in%20Entra%20ID&amp;summary=EntraGoat%20Scenario%201%3a%20Application%20Ownership%20Compromise%20in%20Entra%20ID&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share EntraGoat Scenario 1: Application Ownership Compromise in Entra ID on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f&title=EntraGoat%20Scenario%201%3a%20Application%20Ownership%20Compromise%20in%20Entra%20ID">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share EntraGoat Scenario 1: Application Ownership Compromise in Entra ID on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share EntraGoat Scenario 1: Application Ownership Compromise in Entra ID on whatsapp"
+            href="https://api.whatsapp.com/send?text=EntraGoat%20Scenario%201%3a%20Application%20Ownership%20Compromise%20in%20Entra%20ID%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share EntraGoat Scenario 1: Application Ownership Compromise in Entra ID on telegram"
+            href="https://telegram.me/share/url?text=EntraGoat%20Scenario%201%3a%20Application%20Ownership%20Compromise%20in%20Entra%20ID&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share EntraGoat Scenario 1: Application Ownership Compromise in Entra ID on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=EntraGoat%20Scenario%201%3a%20Application%20Ownership%20Compromise%20in%20Entra%20ID&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fscenario1%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">TomerN</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
