@@ -11,8 +11,17 @@
     </image>
     <generator>Hugo -- 0.146.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 10 Aug 2025 00:14:27 +0300</lastBuildDate>
+    <lastBuildDate>Thu, 14 Aug 2025 00:14:27 +0300</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID</title>
+      <link>http://localhost:1313/posts/scenario6/</link>
+      <pubDate>Thu, 14 Aug 2025 00:14:27 +0300</pubDate>
+      <guid>http://localhost:1313/posts/scenario6/</guid>
+      <description>&lt;h2 id=&#34;certificate-bypass-authorityroot-access-granted&#34;&gt;Certificate Bypass Authority–Root Access Granted&lt;/h2&gt;
+&lt;p&gt;EntraGoat Scenario 6 details a privilege escalation technique in Microsoft Entra ID where the player begins with low-privileged credentials and achieves Global Administrator access by chaining misconfigured service principals, over-permissive app roles, and legitimate certificate-based authentication (CBA) functionality.&lt;/p&gt;
+&lt;p&gt;Using leaked credentials from a legacy service principal, the attacker pivots through owned identity, abuses privileged permissions to modify tenant-wide settings, enables CBA via a user eligible for Privileged Identity Management (PIM) for Groups, and uploads a rogue root certificate authority. This results in passwordless, MFA-compliant impersonation of a Global Admin—enabling complete tenant takeover and persistence.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>EntraGoat Scenario 2: Exploiting App-Only Graph Permissions in Entra ID</title>
       <link>http://localhost:1313/posts/scenario2/</link>
@@ -62,6 +71,23 @@
 &lt;h2 id=&#34;why-do-identity-security-defenders-need-entragoat&#34;&gt;Why do identity security defenders need EntraGoat?&lt;/h2&gt;
 &lt;p&gt;Modern Entra ID environments are a goldmine for attackers. Over-permissioned apps, stale group assignments, and mismanaged service principals offer more than enough to escalate to Global Administrator with a few clever moves.&lt;/p&gt;
 &lt;p&gt;EntraGoat reproduces these attack paths inside your &lt;em&gt;own&lt;/em&gt; test tenant, giving you a safe and reproducible playground to learn, teach, test, or validate:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Meet Silver SAML: Golden SAML in the Cloud</title>
+      <link>http://localhost:1313/posts/silversaml/</link>
+      <pubDate>Thu, 29 Feb 2024 22:35:48 +0300</pubDate>
+      <guid>http://localhost:1313/posts/silversaml/</guid>
+      <description>&lt;h1 id=&#34;key-findings&#34;&gt;Key Findings&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Golden SAML, an attack technique that exploits the SAML single sign-on protocol, was used as a post-breach exploit, compounding the devastating SolarWinds attack of 2020, one of the largest breaches of the 21st century.&lt;/li&gt;
+&lt;li&gt;The supply chain SolarWinds attack affected thousands of organizations around the world, including the US Government. Attackers deployed malicious code into the company’s Orion IT management and monitoring software.&lt;/li&gt;
+&lt;li&gt;In the wake of this attack, CISA and cybersecurity experts encouraged organizations with hybrid identity environments to move SAML authentication to a cloud identity system such as Entra ID.&lt;/li&gt;
+&lt;li&gt;Tomer Nahum and Eric Woodruff have discovered a new application of Golden SAML, one that can be exploited even in organizations that have followed previous security recommendations meant to defend against Golden SAML.&lt;/li&gt;
+&lt;li&gt;The new attack technique, dubbed Silver SAML, enables the exploitation of SAML to launch attacks from an identity provider like Entra ID against applications configured to use it for authentication, such as Salesforce.&lt;/li&gt;
+&lt;li&gt;To our knowledge, no attacks using Silver SAML have been reported.&lt;/li&gt;
+&lt;li&gt;We rate this vulnerability as Moderate, with a potential increase to Severe.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Golden SAML is a known attack technique discovered by CyberArk and &lt;a href=&#34;https://www.cyberark.com/resources/threat-research-blog/golden-saml-newly-discovered-attack-technique-forges-authentication-to-cloud-apps&#34;&gt;published by Shaked Reiner&lt;/a&gt;. (Remember Golden SAML attack that compounded the damage from the SolarWinds cyberattack, aka Solorigate?) For years, Golden SAML has been known for its extraction of signing certificates from Active Directory Federation Services (AD FS) and its use of those certificates to forge SAML authentication responses. Today, we present a new application of Golden SAML—in Microsoft Entra ID and without the use of AD FS. &lt;strong&gt;Meet Silver SAML.&lt;/strong&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

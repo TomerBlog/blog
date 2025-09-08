@@ -202,7 +202,6 @@ Privileged Authentication Administrator is a highly sensitive role in Entra ID. 
 This is exactly why many enumeration frameworks automate these processes. They abstract away repetitive queries and streamline the output, allowing **faster privilege analysis** and **decision-making**. For example, to improve usability we can write simple wrapper functions such as Find-OwnedServicePrincipals and Get-ServicePrincipalRoles that are designed to automate the discovery of SP ownership and resolve directory role assignments more efficiently:
 
 ```powershell
-
 function Find-OwnedServicePrincipals {
 
     param([string]$UserId)
