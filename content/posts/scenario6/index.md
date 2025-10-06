@@ -1,5 +1,5 @@
 ---
-date: '2025-08-14T00:14:27+03:00'
+date: '2025-10-05T00:14:27+03:00'
 draft: false
 title: 'EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID'
 author: ["Tomer Nahum", "Jonathan Elkabas"]
