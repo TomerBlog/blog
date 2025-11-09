@@ -11,7 +11,7 @@
 EntraGoat">
 <meta name="author" content="Theme PaperMod">
 <link rel="canonical" href="http://localhost:1313/posts/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.fed13c992360e4d7010e740c7b8d87665399d4995b4155fa8c51ba9957c69fb4.css" integrity="sha256-/tE8mSNg5NcBDnQMe42HZlOZ1JlbQVX6jFG6mVfGn7Q=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a59eb1fe3d954acf19e87bac091377a5f9194d1458a08ac191d3da5c9eb2b3f2.css" integrity="sha256-pZ6x/j2VSs8Z6HusCRN3pfkZTRRYoIrBkdPaXJ6ys/I=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -159,6 +159,20 @@ EntraGoat">
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">EntraGoat Scenario 3: Exploiting Group Ownership in Entra ID
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Group MemberShipwreck – Sailed into Admin Waters EntraGoat Scenario 3 demonstrates how legitimate Entra ID administrative features - group ownership, role-assignable groups, and service principal management can be chained into an unintended privilege escalation path from a low-privileged user to Global Administrator.
+The attacker begins with a compromised IT support account that owns several groups, including one that is role-assignable with the Application Administrator role. By adding themselves to this group, the attacker inherits the role and gets broad control over applications and service principals across the tenant.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-11-09 00:17:27 +0300 +0300'>November 9, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <a class="entry-link" aria-label="post link to EntraGoat Scenario 3: Exploiting Group Ownership in Entra ID" href="http://localhost:1313/posts/scenario3/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID
     </h2>
   </header>
@@ -167,7 +181,7 @@ EntraGoat">
 Using leaked credentials from a legacy service principal, the attacker pivots through owned identity, abuses privileged permissions to modify tenant-wide settings, enables CBA via a user eligible for Privileged Identity Management (PIM) for Groups, and uploads a rogue root certificate authority. This results in passwordless, MFA-compliant impersonation of a Global Admin—enabling complete tenant takeover and persistence.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-08-14 00:14:27 +0300 IDT'>August 14, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <footer class="entry-footer"><span title='2025-10-05 00:14:27 +0300 IDT'>October 5, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
   <a class="entry-link" aria-label="post link to EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID" href="http://localhost:1313/posts/scenario6/"></a>
 </article>
 
@@ -242,6 +256,19 @@ EntraGoat reproduces these attack paths inside your own test tenant, giving you 
   </div>
   <footer class="entry-footer"><span title='2024-02-29 22:35:48 +0300 +0300'>February 29, 2024</span>&nbsp;·&nbsp;Tomer Nahum, Eric Woodruff</footer>
   <a class="entry-link" aria-label="post link to Meet Silver SAML: Golden SAML in the Cloud" href="http://localhost:1313/posts/silversaml/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Soft-Matching Abuse in Azure AD
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>In Dirk-Jan’s talk at Troopers 19 (I’m in your cloud, reading everyone’s emails - hacking Azure AD via Active Directory), he discussed an issue he discovered that allowed a method (SMTP matching) to synchronize Active Directory (AD) users up to Azure AD to hijack unsynchronized accounts. He stated that Microsoft blocked the ability to synchronize on-prem accounts which had active assignments to administrative roles within Azure, but this sparked the following research. This blog talks about how anyone with account creation privileges in an AD environment can modify the password of an Azure AD user which, with some pre-requisites, can obtain privileged access via Eligible role assignments.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-11-29 22:35:48 +0300 +0300'>November 29, 2022</span>&nbsp;·&nbsp;Tomer Nahum, Sapir Federovsky</footer>
+  <a class="entry-link" aria-label="post link to Soft-Matching Abuse in Azure AD" href="http://localhost:1313/posts/softmatching/"></a>
 </article>
     </main>
     

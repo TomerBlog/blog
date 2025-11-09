@@ -11,12 +11,21 @@
     </image>
     <generator>Hugo -- 0.146.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 14 Aug 2025 00:14:27 +0300</lastBuildDate>
+    <lastBuildDate>Sun, 09 Nov 2025 00:17:27 +0300</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>EntraGoat Scenario 3: Exploiting Group Ownership in Entra ID</title>
+      <link>http://localhost:1313/posts/scenario3/</link>
+      <pubDate>Sun, 09 Nov 2025 00:17:27 +0300</pubDate>
+      <guid>http://localhost:1313/posts/scenario3/</guid>
+      <description>&lt;h2 id=&#34;group-membershipwreck--sailed-into-admin-waters&#34;&gt;Group MemberShipwreck – Sailed into Admin Waters&lt;/h2&gt;
+&lt;p&gt;EntraGoat Scenario 3 demonstrates how legitimate Entra ID administrative features - group ownership, role-assignable groups, and service principal management can be chained into an unintended privilege escalation path from a low-privileged user to Global Administrator.&lt;/p&gt;
+&lt;p&gt;The attacker begins with a compromised IT support account that owns several groups, including one that is role-assignable with the &lt;strong&gt;Application Administrator&lt;/strong&gt; role. By adding themselves to this group, the attacker inherits the role and gets broad control over applications and service principals across the tenant.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID</title>
       <link>http://localhost:1313/posts/scenario6/</link>
-      <pubDate>Thu, 14 Aug 2025 00:14:27 +0300</pubDate>
+      <pubDate>Sun, 05 Oct 2025 00:14:27 +0300</pubDate>
       <guid>http://localhost:1313/posts/scenario6/</guid>
       <description>&lt;h2 id=&#34;certificate-bypass-authorityroot-access-granted&#34;&gt;Certificate Bypass Authority–Root Access Granted&lt;/h2&gt;
 &lt;p&gt;EntraGoat Scenario 6 details a privilege escalation technique in Microsoft Entra ID where the player begins with low-privileged credentials and achieves Global Administrator access by chaining misconfigured service principals, over-permissive app roles, and legitimate certificate-based authentication (CBA) functionality.&lt;/p&gt;
@@ -88,6 +97,14 @@
 &lt;li&gt;We rate this vulnerability as Moderate, with a potential increase to Severe.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Golden SAML is a known attack technique discovered by CyberArk and &lt;a href=&#34;https://www.cyberark.com/resources/threat-research-blog/golden-saml-newly-discovered-attack-technique-forges-authentication-to-cloud-apps&#34;&gt;published by Shaked Reiner&lt;/a&gt;. (Remember Golden SAML attack that compounded the damage from the SolarWinds cyberattack, aka Solorigate?) For years, Golden SAML has been known for its extraction of signing certificates from Active Directory Federation Services (AD FS) and its use of those certificates to forge SAML authentication responses. Today, we present a new application of Golden SAML—in Microsoft Entra ID and without the use of AD FS. &lt;strong&gt;Meet Silver SAML.&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Soft-Matching Abuse in Azure AD</title>
+      <link>http://localhost:1313/posts/softmatching/</link>
+      <pubDate>Tue, 29 Nov 2022 22:35:48 +0300</pubDate>
+      <guid>http://localhost:1313/posts/softmatching/</guid>
+      <description>&lt;p&gt;In &lt;a href=&#34;https://dirkjanm.io/assets/raw/TR19-Im%20in%20your%20cloud.pdf&#34;&gt;Dirk-Jan&amp;rsquo;s talk&lt;/a&gt; at Troopers 19 (I’m in your cloud, reading everyone’s emails - hacking Azure AD via Active Directory), he discussed an issue he discovered that allowed a method (SMTP matching) to synchronize Active Directory (AD) users up to Azure AD to hijack unsynchronized accounts. He stated that Microsoft blocked the ability to synchronize on-prem accounts which had active assignments to administrative roles within Azure, but this sparked the following research.
+This blog talks about how anyone with account creation privileges in an AD environment can modify the password of an Azure AD user which, with some pre-requisites, can obtain privileged access via Eligible role assignments.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

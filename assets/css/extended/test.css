@@ -1,9 +1,45 @@
-body{
-    
-    background-color: #FFFFFF;
+body[data-theme="light"] {
+  background-color: #ffffff;
 }
 
-.list{
-    background-color: #FFFFFF;
+body[data-theme="dark"] {
+  background-color: #111827; /* or match PaperMod's dark bg */
 }
 
+/* List (home, archives) – keep transparent so theme styles apply */
+.list {
+  background-color: transparent;
+}
+
+/* Single post wrapper – keep layout clean and centered */
+.post-single {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background-color: transparent;
+}
+
+/* ==== CODE HIGHLIGHTING ==== */
+.hljs {
+  background: #272822;
+  color: #f8f8f2;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.hljs-keyword { color: #66d9ef; }
+.hljs-string { color: #e6db74; }
+.hljs-comment { color: #75715e; font-style: italic; }
+.hljs-built_in { color: #a6e22e; }
+.hljs-number { color: #ae81ff; }
+
+/* Make sure code looks good in both modes */
+body[data-theme="light"] .hljs {
+  /* if you want slightly lighter for light mode: */
+  background: #272822;
+}
+
+body[data-theme="dark"] .hljs {
+  background: #272822;
+}
