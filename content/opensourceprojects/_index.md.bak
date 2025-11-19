@@ -19,21 +19,7 @@ EntraGoat is designed for security professionals who want to **train**, **test**
 - An **interactive web UI** for challenge management
 - Deployment via **PowerShell + Microsoft Graph API**
 
-🛠️ GitHub: [EntraGoat on Github](https://github.com/semperis/entragoat)
-
----
-
-## 🧰 [SAMLSmith](https://github.com/Semperis/SAMLSmith)
-
-> A versatile SAML manipulation toolkit for red teamers and researchers.
-
-SAMLSmith is a **lightweight but powerful** tool that allows manipulation of SAML assertions for testing a variety of misconfigurations and weaknesses:
-
-- Modify SAML attributes (NameID, Role, Group, etc.)
-
-It’s great for both **educational labs** and advanced testing of **SAML processing logic** in enterprise apps.
-
-🔗 GitHub: [SAMLSmith on Github](https://github.com/semperis/SAMLSmith)
+🛠️ GitHub: [https://github.com/Semperis/Entragoat](https://github.com/semperis/entragoat)
 
 ---
 
@@ -51,9 +37,21 @@ SilverSAMLForger makes it easy to:
 
 🛡️ It's ideal for understanding and testing **SAML token abuse** in hybrid identity environments.
 
-🔗 GitHub: [SilverSAMLForger on Github](https://github.com/semperis/silversamlforger)
+🔗 GitHub: [https://github.com/Semperis/SilverSamlForger](https://github.com/semperis/silversamlforger)
 
+---
 
+## 🧰 [SAMLSmith](https://github.com/Semperis/SAMLSmith)
+
+> A versatile SAML manipulation toolkit for red teamers and researchers.
+
+SAMLSmith is a **lightweight but powerful** tool that allows manipulation of SAML assertions for testing a variety of misconfigurations and weaknesses:
+
+- Modify SAML attributes (NameID, Role, Group, etc.)
+
+It’s great for both **educational labs** and advanced testing of **SAML processing logic** in enterprise apps.
+
+🔗 GitHub: [https://github.com/semperis/SAMLSmith](https://github.com/semperis/SAMLSmith)
 
 
 
