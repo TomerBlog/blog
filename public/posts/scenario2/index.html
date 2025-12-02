@@ -11,7 +11,7 @@
 EntraGoat Scenario 2 demonstrates how certificate-based authentication tied to an existing service principal and overprivileged application permissions can lead to Global Administrator compromise.
 The attacker starts with access to a leaked certificate that was exposed through continuous integration/continuous delivery (CI/CD) pipeline artifacts. The certificate is valid for a service principal that has the AppRoleAssignment.ReadWrite.All application permission.
 By authenticating in an app-only context, the attacker abuses this permission to assign another permission, RoleManagement.ReadWrite.Directory, to the same service principal. This enables the service principal to self-assign any directory role (including Global Administrator) to any service principal it wishes. Finally, the attacker resets the admin’s password and retrieves the scenario flag.">
-<meta name="author" content="Tomer Nahum, Jonathan Elkabas">
+<meta name="author" content="">
 <link rel="canonical" href="http://localhost:1313/posts/scenario2/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.a59eb1fe3d954acf19e87bac091377a5f9194d1458a08ac191d3da5c9eb2b3f2.css" integrity="sha256-pZ6x/j2VSs8Z6HusCRN3pfkZTRRYoIrBkdPaXJ6ys/I=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
@@ -121,10 +121,7 @@ By authenticating in an app-only context, the attacker abuses this permission to
   "dateModified": "2025-08-10T00:14:27+03:00",
   "author":[{
     "@type": "Person",
-    "name": "Tomer Nahum"
-  }, {
-    "@type": "Person",
-    "name": "Jonathan Elkabas"
+    "name": ""
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
@@ -203,7 +200,7 @@ By authenticating in an app-only context, the attacker abuses this permission to
     <h1 class="post-title entry-hint-parent">
       EntraGoat Scenario 2: Exploiting App-Only Graph Permissions in Entra ID
     </h1>
-    <div class="post-meta"><span title='2025-08-10 00:14:27 +0300 IDT'>August 10, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas
+    <div class="post-meta"><span title='2025-08-10 00:14:27 +0300 IDT'>August 10, 2025</span>
 
 </div>
   </header> <div class="toc">

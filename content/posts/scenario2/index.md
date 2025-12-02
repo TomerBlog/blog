@@ -2,7 +2,8 @@
 date: '2025-08-10T00:14:27+03:00'
 draft: false
 title: 'EntraGoat Scenario 2: Exploiting App-Only Graph Permissions in Entra ID'
-author: ["Tomer Nahum", "Jonathan Elkabas"]
+#author: ["Tomer Nahum", "Jonathan Elkabas"]
+author: [""]
 ---
 
 

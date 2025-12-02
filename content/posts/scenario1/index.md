@@ -2,7 +2,8 @@
 date: '2025-08-10T00:14:26+03:00'
 draft: false
 title: 'EntraGoat Scenario 1: Application Ownership Compromise in Entra ID'
-author: ["Tomer Nahum", "Jonathan Elkabas"]
+#author: ["Tomer Nahum", "Jonathan Elkabas"]
+author: [""]
 ---
 
 # Misowned and dangerous: An Owner’s Manual to Global Admin

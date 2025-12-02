@@ -9,7 +9,7 @@
 <meta name="keywords" content="">
 <meta name="description" content="In Dirk-Jan&rsquo;s talk at Troopers 19 (I’m in your cloud, reading everyone’s emails - hacking Azure AD via Active Directory), he discussed an issue he discovered that allowed a method (SMTP matching) to synchronize Active Directory (AD) users up to Azure AD to hijack unsynchronized accounts. He stated that Microsoft blocked the ability to synchronize on-prem accounts which had active assignments to administrative roles within Azure, but this sparked the following research.
 This blog talks about how anyone with account creation privileges in an AD environment can modify the password of an Azure AD user which, with some pre-requisites, can obtain privileged access via Eligible role assignments.">
-<meta name="author" content="Tomer Nahum, Sapir Federovsky">
+<meta name="author" content="">
 <link rel="canonical" href="http://localhost:1313/posts/softmatching/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.a59eb1fe3d954acf19e87bac091377a5f9194d1458a08ac191d3da5c9eb2b3f2.css" integrity="sha256-pZ6x/j2VSs8Z6HusCRN3pfkZTRRYoIrBkdPaXJ6ys/I=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
@@ -115,10 +115,7 @@ This blog talks about how anyone with account creation privileges in an AD envir
   "dateModified": "2022-11-29T22:35:48+03:00",
   "author":[{
     "@type": "Person",
-    "name": "Tomer Nahum"
-  }, {
-    "@type": "Person",
-    "name": "Sapir Federovsky"
+    "name": ""
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
@@ -197,7 +194,7 @@ This blog talks about how anyone with account creation privileges in an AD envir
     <h1 class="post-title entry-hint-parent">
       Soft-Matching Abuse in Azure AD
     </h1>
-    <div class="post-meta"><span title='2022-11-29 22:35:48 +0300 +0300'>November 29, 2022</span>&nbsp;·&nbsp;Tomer Nahum, Sapir Federovsky
+    <div class="post-meta"><span title='2022-11-29 22:35:48 +0300 +0300'>November 29, 2022</span>
 
 </div>
   </header> <div class="toc">

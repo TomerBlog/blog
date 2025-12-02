@@ -2,8 +2,8 @@
 date: '2022-11-29T22:35:48+03:00'
 draft: false
 title: 'Soft-Matching Abuse in Azure AD'
-author: ["Tomer Nahum", "Sapir Federovsky"]
-
+#author: ["Tomer Nahum", "Sapir Federovsky"]
+author: [""]
 ---
 
 

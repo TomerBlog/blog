@@ -184,7 +184,7 @@
 The attacker begins with a compromised IT support account that owns several groups, including one that is role-assignable with the Application Administrator role. By adding themselves to this group, the attacker inherits the role and gets broad control over applications and service principals across the tenant.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-11-09 00:17:27 +0300 +0300'>November 9, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <footer class="entry-footer"><span title='2025-11-09 00:17:27 +0300 +0300'>November 9, 2025</span></footer>
   <a class="entry-link" aria-label="post link to EntraGoat Scenario 3: Exploiting Group Ownership in Entra ID" href="http://localhost:1313/posts/scenario3/"></a>
 </article>
 
@@ -198,7 +198,7 @@ The attacker begins with a compromised IT support account that owns several grou
 Using leaked credentials from a legacy service principal, the attacker pivots through owned identity, abuses privileged permissions to modify tenant-wide settings, enables CBA via a user eligible for Privileged Identity Management (PIM) for Groups, and uploads a rogue root certificate authority. This results in passwordless, MFA-compliant impersonation of a Global Admin—enabling complete tenant takeover and persistence.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-10-05 00:14:27 +0300 IDT'>October 5, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <footer class="entry-footer"><span title='2025-10-05 00:14:27 +0300 IDT'>October 5, 2025</span></footer>
   <a class="entry-link" aria-label="post link to EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID" href="http://localhost:1313/posts/scenario6/"></a>
 </article>
 
@@ -213,7 +213,7 @@ The attacker starts with access to a leaked certificate that was exposed through
 By authenticating in an app-only context, the attacker abuses this permission to assign another permission, RoleManagement.ReadWrite.Directory, to the same service principal. This enables the service principal to self-assign any directory role (including Global Administrator) to any service principal it wishes. Finally, the attacker resets the admin’s password and retrieves the scenario flag.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-08-10 00:14:27 +0300 IDT'>August 10, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <footer class="entry-footer"><span title='2025-08-10 00:14:27 +0300 IDT'>August 10, 2025</span></footer>
   <a class="entry-link" aria-label="post link to EntraGoat Scenario 2: Exploiting App-Only Graph Permissions in Entra ID" href="http://localhost:1313/posts/scenario2/"></a>
 </article>
 
@@ -227,7 +227,7 @@ By authenticating in an app-only context, the attacker abuses this permission to
 Starting with a compromised low-privileged user account, the attacker discovers ownership over an enterprise application (service principal) that is assigned a privileged role.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-08-10 00:14:26 +0300 IDT'>August 10, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <footer class="entry-footer"><span title='2025-08-10 00:14:26 +0300 IDT'>August 10, 2025</span></footer>
   <a class="entry-link" aria-label="post link to EntraGoat Scenario 1: Application Ownership Compromise in Entra ID" href="http://localhost:1313/posts/scenario1/"></a>
 </article>
 
@@ -242,7 +242,7 @@ What is EntraGoat? Imagine a playground where you can:
 Escalate a user to Global Admin Chain permissions via the Graph API Abuse misconfigured apps and service principals Activate privileged roles to reset global admin’s MFA Simulate attacks without endangering production environments That’s exactly what EntraGoat offers: a CTF-style platform for identity exploitation learning in the cloud (Figure 1).
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-08-04 22:35:48 +0300 IDT'>August 4, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <footer class="entry-footer"><span title='2025-08-04 22:35:48 +0300 IDT'>August 4, 2025</span></footer>
   <a class="entry-link" aria-label="post link to Getting Started with EntraGoat: Breaking Entra ID the Smart Way" href="http://localhost:1313/posts/gettingstarted/"></a>
 </article>
 
@@ -258,7 +258,7 @@ Why do identity security defenders need EntraGoat? Modern Entra ID environments 
 EntraGoat reproduces these attack paths inside your own test tenant, giving you a safe and reproducible playground to learn, teach, test, or validate:
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-08-04 22:35:48 +0300 IDT'>August 4, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas</footer>
+  <footer class="entry-footer"><span title='2025-08-04 22:35:48 +0300 IDT'>August 4, 2025</span></footer>
   <a class="entry-link" aria-label="post link to What is Entra Goat?" href="http://localhost:1313/posts/whatisentra/"></a>
 </article>
 
@@ -271,7 +271,7 @@ EntraGoat reproduces these attack paths inside your own test tenant, giving you 
     <p>Key Findings Golden SAML, an attack technique that exploits the SAML single sign-on protocol, was used as a post-breach exploit, compounding the devastating SolarWinds attack of 2020, one of the largest breaches of the 21st century. The supply chain SolarWinds attack affected thousands of organizations around the world, including the US Government. Attackers deployed malicious code into the company’s Orion IT management and monitoring software. In the wake of this attack, CISA and cybersecurity experts encouraged organizations with hybrid identity environments to move SAML authentication to a cloud identity system such as Entra ID. Tomer Nahum and Eric Woodruff have discovered a new application of Golden SAML, one that can be exploited even in organizations that have followed previous security recommendations meant to defend against Golden SAML. The new attack technique, dubbed Silver SAML, enables the exploitation of SAML to launch attacks from an identity provider like Entra ID against applications configured to use it for authentication, such as Salesforce. To our knowledge, no attacks using Silver SAML have been reported. We rate this vulnerability as Moderate, with a potential increase to Severe. Golden SAML is a known attack technique discovered by CyberArk and published by Shaked Reiner. (Remember Golden SAML attack that compounded the damage from the SolarWinds cyberattack, aka Solorigate?) For years, Golden SAML has been known for its extraction of signing certificates from Active Directory Federation Services (AD FS) and its use of those certificates to forge SAML authentication responses. Today, we present a new application of Golden SAML—in Microsoft Entra ID and without the use of AD FS. Meet Silver SAML.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2024-02-29 22:35:48 +0300 +0300'>February 29, 2024</span>&nbsp;·&nbsp;Tomer Nahum, Eric Woodruff</footer>
+  <footer class="entry-footer"><span title='2024-02-29 22:35:48 +0300 +0300'>February 29, 2024</span></footer>
   <a class="entry-link" aria-label="post link to Meet Silver SAML: Golden SAML in the Cloud" href="http://localhost:1313/posts/silversaml/"></a>
 </article>
 
@@ -284,7 +284,7 @@ EntraGoat reproduces these attack paths inside your own test tenant, giving you 
     <p>In Dirk-Jan’s talk at Troopers 19 (I’m in your cloud, reading everyone’s emails - hacking Azure AD via Active Directory), he discussed an issue he discovered that allowed a method (SMTP matching) to synchronize Active Directory (AD) users up to Azure AD to hijack unsynchronized accounts. He stated that Microsoft blocked the ability to synchronize on-prem accounts which had active assignments to administrative roles within Azure, but this sparked the following research. This blog talks about how anyone with account creation privileges in an AD environment can modify the password of an Azure AD user which, with some pre-requisites, can obtain privileged access via Eligible role assignments.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2022-11-29 22:35:48 +0300 +0300'>November 29, 2022</span>&nbsp;·&nbsp;Tomer Nahum, Sapir Federovsky</footer>
+  <footer class="entry-footer"><span title='2022-11-29 22:35:48 +0300 +0300'>November 29, 2022</span></footer>
   <a class="entry-link" aria-label="post link to Soft-Matching Abuse in Azure AD" href="http://localhost:1313/posts/softmatching/"></a>
 </article>
     </main>

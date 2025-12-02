@@ -2,7 +2,8 @@
 date: '2025-11-09T00:17:27+03:00'
 draft: false
 title: 'EntraGoat Scenario 3: Exploiting Group Ownership in Entra ID'
-author: ["Tomer Nahum", "Jonathan Elkabas"]
+#author: ["Tomer Nahum", "Jonathan Elkabas"]
+author: [""]
 ---
 
 

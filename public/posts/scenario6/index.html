@@ -10,7 +10,7 @@
 <meta name="description" content="Certificate Bypass Authority–Root Access Granted
 EntraGoat Scenario 6 details a privilege escalation technique in Microsoft Entra ID where the player begins with low-privileged credentials and achieves Global Administrator access by chaining misconfigured service principals, over-permissive app roles, and legitimate certificate-based authentication (CBA) functionality.
 Using leaked credentials from a legacy service principal, the attacker pivots through owned identity, abuses privileged permissions to modify tenant-wide settings, enables CBA via a user eligible for Privileged Identity Management (PIM) for Groups, and uploads a rogue root certificate authority. This results in passwordless, MFA-compliant impersonation of a Global Admin—enabling complete tenant takeover and persistence.">
-<meta name="author" content="Tomer Nahum, Jonathan Elkabas">
+<meta name="author" content="">
 <link rel="canonical" href="http://localhost:1313/posts/scenario6/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.a59eb1fe3d954acf19e87bac091377a5f9194d1458a08ac191d3da5c9eb2b3f2.css" integrity="sha256-pZ6x/j2VSs8Z6HusCRN3pfkZTRRYoIrBkdPaXJ6ys/I=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
@@ -118,10 +118,7 @@ Using leaked credentials from a legacy service principal, the attacker pivots th
   "dateModified": "2025-10-05T00:14:27+03:00",
   "author":[{
     "@type": "Person",
-    "name": "Tomer Nahum"
-  }, {
-    "@type": "Person",
-    "name": "Jonathan Elkabas"
+    "name": ""
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
@@ -200,7 +197,7 @@ Using leaked credentials from a legacy service principal, the attacker pivots th
     <h1 class="post-title entry-hint-parent">
       EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID
     </h1>
-    <div class="post-meta"><span title='2025-10-05 00:14:27 +0300 IDT'>October 5, 2025</span>&nbsp;·&nbsp;Tomer Nahum, Jonathan Elkabas
+    <div class="post-meta"><span title='2025-10-05 00:14:27 +0300 IDT'>October 5, 2025</span>
 
 </div>
   </header> <div class="toc">

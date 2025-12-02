@@ -2,8 +2,8 @@
 date: '2024-02-29T22:35:48+03:00'
 draft: false
 title: 'Meet Silver SAML: Golden SAML in the Cloud'
-author: ["Tomer Nahum", "Eric Woodruff"]
-
+#author: ["Tomer Nahum", "Eric Woodruff"]
+author: [""]
 ---
 
 

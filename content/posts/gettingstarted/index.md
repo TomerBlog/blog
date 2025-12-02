@@ -2,7 +2,9 @@
 date: '2025-08-04T22:35:48+03:00'
 draft: false
 title: 'Getting Started with EntraGoat: Breaking Entra ID the Smart Way'
-author: ["Tomer Nahum", "Jonathan Elkabas"]
+#author: ["Tomer Nahum", "Jonathan Elkabas"]
+author: [""]
+
 ---
 # **Getting Started with EntraGoat: Breaking Entra ID the Smart Way**
 
