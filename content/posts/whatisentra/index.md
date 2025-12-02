@@ -2,7 +2,6 @@
 date: '2025-08-04T22:35:48+03:00'
 draft: false
 title: 'What is Entra Goat?'
-#author: ["Tomer Nahum", "Jonathan Elkabas"]
 author: [""]
 ---
 
