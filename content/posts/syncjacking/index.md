@@ -1,0 +1,156 @@
+---
+date: '2026-01-13T22:35:48+03:00'
+draft: false
+title: 'SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover'
+author: [""]
+---
+
+**January 13, 2026 update:** The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an **Important** privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions. 
+
+## What is SyncJacking?
+
+This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).
+
+**This *SyncJacking* vulnerability means that an attacker with certain privileges can abuse hard matching synchronization in Entra Connect to completely take over any synchronized Entra ID account—including Active Global Administrator.**
+
+These findings were promptly reported to the Microsoft Security Response Center (MSRC), which updated hardening guidelines to provide more specific mitigations against hard matching abuse. While MSRC rapidly responded and updated the hardening guidelines, further testing shows that the attack can succeed even after these mitigations are implemented. Therefore, we strongly advise extra mitigation to combat abuse and potential Entra ID account takeover. 
+
+## Entra Connect and hard matching
+
+As explained in “SMTP Matching Abuse in Azure AD,” Entra Connect is a Microsoft application that supports hybrid identity by synchronizing on-prem AD objects with Entra ID objects. Entra Connect features include password hash synchronization, pass-through authentication, federation integration (with ADFS), and synchronization (with Entra Connect Sync). 
+
+The hard-matching Entra ID account takeover discussed here abuses the password hash synchronization and general synchronization features of Entra Connect. 
+
+To achieve integrity between the on-prem environment and Entra ID tenants in hybrid identity implementations, Entra Connect matches user objects between AD and Entra ID. A source anchor attribute, chosen during initial Entra Connect setup and synchronization, uniquely identifies each of these user objects between AD and Entra ID. Entra Connect uses this attribute to match user objects between Entra ID and AD using one of two techniques: 
+
+* Hard matching  
+* Soft (SMTP) matching :contentReference[oaicite:8]{index=8}
+
+### Hard matching
+
+If you let Azure manage the source anchor, Entra Connect looks for one of two possible **sourceAnchor** attributes: 
+
+* Entra Connect version 1.1.486.0 or older looks for the **objectGUID**  
+* Entra Connect version 1.1.524.0 or newer looks for the **mS-DS-ConsistencyGuid** 
+
+If the **mS-DS-ConsistencyGuid** attribute is unpopulated, Entra Connect writes the user’s **objectGUID** to that attribute. The corresponding value on the Entra ID object is **ImmutableID** (the base64-encoded **objectGUID**). Figure 1 shows an example of hard matching: getting the **ImmutableID** of an Entra ID object from the on-prem AD user’s **objectGUID**. 
+
+![](SyncJacking_Figure-1_PS-Source-anchor.png)
+
+**This mechanism is the object of the abuse discussed in this post.**
+
+### Password hash synchronization
+
+Password hash synchronization, an authentication method that is enabled by default in Entra ID hybrid identity environments, synchronizes the user’s on-prem AD password hash to Entra ID every two minutes. This synchronization enables the use of the same password to log in to both AD and Entra ID. (For a detailed explanation of password hash synchronization, see “Understanding Azure AD Password Hash Sync.”) 
+
+## How attackers can use hard matching to facilitate Entra ID account takeover
+
+To perform this attack, an attacker requires only two permissions: 
+
+* Write-all-Properties or GenericWrite on an unsynchronized on-prem AD account or Write on mS-DS-ConsistencyGuid  
+* Delete on a synchronized on-prem AD account 
+
+The following example illustrates this attack on an account with an Active Global Administrator role assignment in Entra ID. **Note that this attack works on *any* synced account.** 
+
+Nutshell is a synchronized Active Global Administrator in Entra ID with the UPN nutshell@xd6z7.onmicrosoft.com (Figure 2, Figure 3). 
+
+![](SyncJacking_Figure-2_NutshellIsSynced-1024x62.png)
+![](SyncJacking_Figure-3_nutshellGlobalAdmin-1024x103.png)
+
+Because nutshell is a synchronized user, it has a presence in the on-prem AD environment. The attacker has Write-All-Properties permission on an unsynchronized on-prem AD account **AliceIC**. The attacker also has Delete permission on the synchronized on-prem AD **nutshell** account. In addition, the attacker has the password for the **AliceIC** account. 
+
+Here’s how the attacker can use the on-prem user **AliceIC** to hijack the **nutshell** Entra ID account. 
+
+First, the attacker copies the **nutshell** Entra ID UPN to the **AliceIC** on-prem AD **userPrincipalName** attribute (Figure 4). 
+
+![](SyncJacking_Figure-4_AliceICNewUPN.png)
+
+Figure 5 shows the population of the **nutshell** on-prem AD **mS-DS-ConsistencyGuid** attribute. 
+
+![](SyncJacking_Figure-5_nutshellmsds.png)
+
+Next, the attacker copies the value of the **nutshell** **mS-DS-ConsistencyGuid** attribute into the **AliceIC** **mS-DS-ConsistencyGuid** attribute (Figure 6). 
+
+![](SyncJacking_Figure-6_AliceNewMsdsConsistency.png)
+
+Finally, the attacker deletes the on-prem **nutshell** account and waits for synchronization (Figure 7). 
+
+![](SyncJacking_Fig7.png)
+
+Now, the **AliceIC** on-prem AD account is synchronized to the nutshell Entra ID account. Because Entra Connect uses password hash synchronization by default, the **AliceIC** password and DisplayName attribute are also synchronized to the **nutshell** Entra ID account. 
+
+**AliceIC** is now an Active Global Administrator and acting on behalf of nutshell (Figure 8). As mentioned earlier, **you will find no trace of these changes in on-prem logs and only minimal trace in Entra ID logs**. 
+
+![](SyncJacking_Figure-8_AliceNowGlobalAdmin-1024x146.png)
+
+It’s important to note why attackers might exploit this method:
+
+* The use of hard matching to facilitate Entra ID account takeover leaves no trace in on-prem AD logs and only minimal trace in Entra ID logs.  
+* The attack requires only two permissions on target accounts to completely take over any synchronized account with any role.  
+* An attacker who possesses relatively high permissions in AD can take over Entra ID by taking over any synchronized account with an Active/Eligible assignment. 
+
+## Potential abuses
+
+**User delegation**. If a user or group has been delegated control to manage users in one or more organizational units (OUs) with synchronized and unsynchronized users, then that user or group has full control of these objects and can hijack any of them—theoretically even becoming a Global Administrator. 
+
+**Account Operators**. Any user in the Account Operators group can manage all accounts and has account creation privileges. Therefore, any Account Operator can hijack any synchronized users. 
+
+## SyncJacking detection
+
+### Other ways to detect SyncJacking abuse
+
+You can reasonably (although not definitively) assume that this attack has occurred if two log events occur one after another in Entra ID: “Change user password” followed by “Update User” with a changed DisplayName and a target that uses the same UPN (Figure 9, Figure 10). 
+
+![](SyncJacking_Figure-9_ChangeUserPasswordWith-1024x301.png)
+
+![](SyncJacking_Figure-10_UpdateUser.png)
+
+## SyncJacking remediation
+
+In 2022, MSRC updated its guidelines to include the following recommendation: 
+
+Disable hard match takeover. Hard match takeover allows Entra Connect to take control of a cloud managed object and changing the source of authority for the object to Active Directory. Once the source of authority of an object is taken over by Entra Connect, changes made to the Active Directory object that is linked to the Entra ID object will overwrite the original Entra ID data – including the password hash, if Password Hash Sync is enabled. 
+
+An attacker could use this capability to take over control of cloud-managed objects. To mitigate this risk, disable hard match takeover. 
+
+Our testing shows that SyncJacking works even after disabling hard match takeover. Regardless, this hardening guideline is important to apply. 
+
+MSRC states that it is important to enable MFA for all users who have privileged access in Entra ID or in AD. Currently, the only way to mitigate this attack is to enforce MFA on all synced users. This isn’t a surefire way to stop an attacker from accessing your account if SyncJacking is abused, but it can help. Be sure to follow all hardening guidelines provided by Microsoft in the previous link to mitigate many attack surfaces in your hybrid identity environment. 
+
+For even greater protection, consider implementing DSP for Identity Threat Detection and Response (ITDR). 
+
+## 2026 update: Vulnerability confirmed; fix in progress
+
+Since the publication of this original research, MSRC has confirmed the vulnerability underlying the SyncJacking attack technique. 
+
+As explained earlier in this blog, SyncJacking abuses identity-matching behavior in hybrid environments to remap an existing Entra ID account to an attacker-controlled on-premises object, resulting in full account takeover. This behavior is not the result of a misconfiguration alone, but of how synchronization trust boundaries were enforced. 
+
+Following responsible disclosure, Microsoft acknowledged the risk and has been working on platform-level protections to prevent this abuse. Microsoft has now implemented security hardening in Entra Connect. This hardening is designed to block unauthorized account remapping scenarios that enable SyncJacking attacks.
+
+Microsoft has announced that these protections are being rolled out and enforced, with full enforcement expected to begin in March 2026, depending on tenant configuration and Entra Connect version. Organizations must ensure that they are running a supported and up-to-date version of Entra Connect to benefit from these protections. 
+## Why this research matters
+
+As shown earlier in this blog, identity synchronization is a powerful trust bridge between on-premises Active Directory and Entra ID. The confirmation and remediation of this vulnerability reinforce a key takeaway: Hybrid identity components must be treated as security-critical infrastructure, not just integration tooling. 
+
+## Disclosure timeline
+
+* October 6, 2022: Semperis discovers abuse and reports it to MSRC.  
+* October 12, 2022: MSRC replies with hardening guidelines.  
+* October 18, 2022: Semperis responds to MSRC with new information; attack still works with mitigations applied.  
+* October 27, 2022: MSRC reopens the case to review the information.  
+* November 4, 2022: MSRC updates documentation hardening guidelines to specifically mitigate against hard matching abuse, and notes that the hard matching behavior described here is by design.  
+* November 7, 2022: Semperis responds to MSRC; attack still works with hardening guidelines applied.  
+* November 11, 2022: MSRC maintains that the behavior is by design.  
+* May 2025: MSRC confirms this vulnerability as an Important privilege escalation vulnerability.  
+* Late 2025: Microsoft announces Entra Connect security hardening to prevent account remapping abuse  
+* March 2026 (planned): Enforcement of protections begins for supported Entra Connect versions 
+
+## Acknowledgments
+
+Special thanks to the following people:  
+
+* Andrea Pierini (@decoder_it)  
+* Charlie Clark (@exploitph)  
+* Sapir Federovsky (@sapirxfed)  
+
+Special acknowledgment to MSRC for recognizing the exposure and rapidly responding with updated guidelines. 

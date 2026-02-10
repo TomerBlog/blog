@@ -23,6 +23,15 @@
 &lt;p&gt;The attacker begins with a compromised IT support account that owns several groups, including one that is role-assignable with the &lt;strong&gt;Application Administrator&lt;/strong&gt; role. By adding themselves to this group, the attacker inherits the role and gets broad control over applications and service principals across the tenant.&lt;/p&gt;</description>
     </item>
     <item>
+      <title>SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover</title>
+      <link>http://localhost:1313/posts/syncjacking/</link>
+      <pubDate>Sat, 01 Nov 2025 22:35:48 +0300</pubDate>
+      <guid>http://localhost:1313/posts/syncjacking/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;January 13, 2026 update:&lt;/strong&gt; The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an &lt;strong&gt;Important&lt;/strong&gt; privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions.&lt;/p&gt;
+&lt;h2 id=&#34;what-is-syncjacking&#34;&gt;What is SyncJacking?&lt;/h2&gt;
+&lt;p&gt;This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>EntraGoat Scenario 6: Exploiting Chained Misconfigurations to Impersonate Global Admin in Entra ID</title>
       <link>http://localhost:1313/posts/scenario6/</link>
       <pubDate>Sun, 05 Oct 2025 00:14:27 +0300</pubDate>

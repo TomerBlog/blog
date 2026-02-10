@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover | TomerN</title>
+<meta name="keywords" content="">
+<meta name="description" content="January 13, 2026 update: The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an Important privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions.
+What is SyncJacking?
+This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/syncjacking/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a59eb1fe3d954acf19e87bac091377a5f9194d1458a08ac191d3da5c9eb2b3f2.css" integrity="sha256-pZ6x/j2VSs8Z6HusCRN3pfkZTRRYoIrBkdPaXJ6ys/I=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/syncjacking/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><html>
+
+<body>
+
+</body>
+</html><meta property="og:url" content="http://localhost:1313/posts/syncjacking/">
+  <meta property="og:site_name" content="TomerN">
+  <meta property="og:title" content="SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover">
+  <meta property="og:description" content="January 13, 2026 update: The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an Important privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions.
+What is SyncJacking? This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-01-13T22:35:48+03:00">
+    <meta property="article:modified_time" content="2026-01-13T22:35:48+03:00">
+      <meta property="og:image" content="http://localhost:1313/images/tomer.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/images/tomer.jpg">
+<meta name="twitter:title" content="SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover">
+<meta name="twitter:description" content="January 13, 2026 update: The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an Important privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions.
+What is SyncJacking?
+This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover",
+      "item": "http://localhost:1313/posts/syncjacking/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover",
+  "name": "SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover",
+  "description": "January 13, 2026 update: The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an Important privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions.\nWhat is SyncJacking? This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "January 13, 2026 update: The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an Important privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions.\nWhat is SyncJacking? This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).\nThis SyncJacking vulnerability means that an attacker with certain privileges can abuse hard matching synchronization in Entra Connect to completely take over any synchronized Entra ID account—including Active Global Administrator.\nThese findings were promptly reported to the Microsoft Security Response Center (MSRC), which updated hardening guidelines to provide more specific mitigations against hard matching abuse. While MSRC rapidly responded and updated the hardening guidelines, further testing shows that the attack can succeed even after these mitigations are implemented. Therefore, we strongly advise extra mitigation to combat abuse and potential Entra ID account takeover.\nEntra Connect and hard matching As explained in “SMTP Matching Abuse in Azure AD,” Entra Connect is a Microsoft application that supports hybrid identity by synchronizing on-prem AD objects with Entra ID objects. Entra Connect features include password hash synchronization, pass-through authentication, federation integration (with ADFS), and synchronization (with Entra Connect Sync).\nThe hard-matching Entra ID account takeover discussed here abuses the password hash synchronization and general synchronization features of Entra Connect.\nTo achieve integrity between the on-prem environment and Entra ID tenants in hybrid identity implementations, Entra Connect matches user objects between AD and Entra ID. A source anchor attribute, chosen during initial Entra Connect setup and synchronization, uniquely identifies each of these user objects between AD and Entra ID. Entra Connect uses this attribute to match user objects between Entra ID and AD using one of two techniques:\nHard matching Soft (SMTP) matching :contentReference[oaicite:8]{index=8} Hard matching If you let Azure manage the source anchor, Entra Connect looks for one of two possible sourceAnchor attributes:\nEntra Connect version 1.1.486.0 or older looks for the objectGUID Entra Connect version 1.1.524.0 or newer looks for the mS-DS-ConsistencyGuid If the mS-DS-ConsistencyGuid attribute is unpopulated, Entra Connect writes the user’s objectGUID to that attribute. The corresponding value on the Entra ID object is ImmutableID (the base64-encoded objectGUID). Figure 1 shows an example of hard matching: getting the ImmutableID of an Entra ID object from the on-prem AD user’s objectGUID.\nThis mechanism is the object of the abuse discussed in this post.\nPassword hash synchronization Password hash synchronization, an authentication method that is enabled by default in Entra ID hybrid identity environments, synchronizes the user’s on-prem AD password hash to Entra ID every two minutes. This synchronization enables the use of the same password to log in to both AD and Entra ID. (For a detailed explanation of password hash synchronization, see “Understanding Azure AD Password Hash Sync.”)\nHow attackers can use hard matching to facilitate Entra ID account takeover To perform this attack, an attacker requires only two permissions:\nWrite-all-Properties or GenericWrite on an unsynchronized on-prem AD account or Write on mS-DS-ConsistencyGuid Delete on a synchronized on-prem AD account The following example illustrates this attack on an account with an Active Global Administrator role assignment in Entra ID. Note that this attack works on any synced account.\nNutshell is a synchronized Active Global Administrator in Entra ID with the UPN nutshell@xd6z7.onmicrosoft.com (Figure 2, Figure 3).\nBecause nutshell is a synchronized user, it has a presence in the on-prem AD environment. The attacker has Write-All-Properties permission on an unsynchronized on-prem AD account AliceIC. The attacker also has Delete permission on the synchronized on-prem AD nutshell account. In addition, the attacker has the password for the AliceIC account.\nHere’s how the attacker can use the on-prem user AliceIC to hijack the nutshell Entra ID account.\nFirst, the attacker copies the nutshell Entra ID UPN to the AliceIC on-prem AD userPrincipalName attribute (Figure 4).\nFigure 5 shows the population of the nutshell on-prem AD mS-DS-ConsistencyGuid attribute.\nNext, the attacker copies the value of the nutshell mS-DS-ConsistencyGuid attribute into the AliceIC mS-DS-ConsistencyGuid attribute (Figure 6).\nFinally, the attacker deletes the on-prem nutshell account and waits for synchronization (Figure 7).\nNow, the AliceIC on-prem AD account is synchronized to the nutshell Entra ID account. Because Entra Connect uses password hash synchronization by default, the AliceIC password and DisplayName attribute are also synchronized to the nutshell Entra ID account.\nAliceIC is now an Active Global Administrator and acting on behalf of nutshell (Figure 8). As mentioned earlier, you will find no trace of these changes in on-prem logs and only minimal trace in Entra ID logs.\nIt’s important to note why attackers might exploit this method:\nThe use of hard matching to facilitate Entra ID account takeover leaves no trace in on-prem AD logs and only minimal trace in Entra ID logs. The attack requires only two permissions on target accounts to completely take over any synchronized account with any role. An attacker who possesses relatively high permissions in AD can take over Entra ID by taking over any synchronized account with an Active/Eligible assignment. Potential abuses User delegation. If a user or group has been delegated control to manage users in one or more organizational units (OUs) with synchronized and unsynchronized users, then that user or group has full control of these objects and can hijack any of them—theoretically even becoming a Global Administrator.\nAccount Operators. Any user in the Account Operators group can manage all accounts and has account creation privileges. Therefore, any Account Operator can hijack any synchronized users.\nSyncJacking detection Other ways to detect SyncJacking abuse You can reasonably (although not definitively) assume that this attack has occurred if two log events occur one after another in Entra ID: “Change user password” followed by “Update User” with a changed DisplayName and a target that uses the same UPN (Figure 9, Figure 10).\nSyncJacking remediation In 2022, MSRC updated its guidelines to include the following recommendation:\nDisable hard match takeover. Hard match takeover allows Entra Connect to take control of a cloud managed object and changing the source of authority for the object to Active Directory. Once the source of authority of an object is taken over by Entra Connect, changes made to the Active Directory object that is linked to the Entra ID object will overwrite the original Entra ID data – including the password hash, if Password Hash Sync is enabled.\nAn attacker could use this capability to take over control of cloud-managed objects. To mitigate this risk, disable hard match takeover.\nOur testing shows that SyncJacking works even after disabling hard match takeover. Regardless, this hardening guideline is important to apply.\nMSRC states that it is important to enable MFA for all users who have privileged access in Entra ID or in AD. Currently, the only way to mitigate this attack is to enforce MFA on all synced users. This isn’t a surefire way to stop an attacker from accessing your account if SyncJacking is abused, but it can help. Be sure to follow all hardening guidelines provided by Microsoft in the previous link to mitigate many attack surfaces in your hybrid identity environment.\nFor even greater protection, consider implementing DSP for Identity Threat Detection and Response (ITDR).\n2026 update: Vulnerability confirmed; fix in progress Since the publication of this original research, MSRC has confirmed the vulnerability underlying the SyncJacking attack technique.\nAs explained earlier in this blog, SyncJacking abuses identity-matching behavior in hybrid environments to remap an existing Entra ID account to an attacker-controlled on-premises object, resulting in full account takeover. This behavior is not the result of a misconfiguration alone, but of how synchronization trust boundaries were enforced.\nFollowing responsible disclosure, Microsoft acknowledged the risk and has been working on platform-level protections to prevent this abuse. Microsoft has now implemented security hardening in Entra Connect. This hardening is designed to block unauthorized account remapping scenarios that enable SyncJacking attacks.\nMicrosoft has announced that these protections are being rolled out and enforced, with full enforcement expected to begin in March 2026, depending on tenant configuration and Entra Connect version. Organizations must ensure that they are running a supported and up-to-date version of Entra Connect to benefit from these protections.\nWhy this research matters As shown earlier in this blog, identity synchronization is a powerful trust bridge between on-premises Active Directory and Entra ID. The confirmation and remediation of this vulnerability reinforce a key takeaway: Hybrid identity components must be treated as security-critical infrastructure, not just integration tooling.\nDisclosure timeline October 6, 2022: Semperis discovers abuse and reports it to MSRC. October 12, 2022: MSRC replies with hardening guidelines. October 18, 2022: Semperis responds to MSRC with new information; attack still works with mitigations applied. October 27, 2022: MSRC reopens the case to review the information. November 4, 2022: MSRC updates documentation hardening guidelines to specifically mitigate against hard matching abuse, and notes that the hard matching behavior described here is by design. November 7, 2022: Semperis responds to MSRC; attack still works with hardening guidelines applied. November 11, 2022: MSRC maintains that the behavior is by design. May 2025: MSRC confirms this vulnerability as an Important privilege escalation vulnerability. Late 2025: Microsoft announces Entra Connect security hardening to prevent account remapping abuse March 2026 (planned): Enforcement of protections begins for supported Entra Connect versions Acknowledgments Special thanks to the following people:\nAndrea Pierini (@decoder_it) Charlie Clark (@exploitph) Sapir Federovsky (@sapirxfed) Special acknowledgment to MSRC for recognizing the exposure and rapidly responding with updated guidelines.\n",
+  "wordCount" : "1611",
+  "inLanguage": "en",
+  "image": "http://localhost:1313/images/tomer.jpg","datePublished": "2026-01-13T22:35:48+03:00",
+  "dateModified": "2026-01-13T22:35:48+03:00",
+  "author":[{
+    "@type": "Person",
+    "name": ""
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/syncjacking/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TomerN",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="TomerN (Alt + H)">TomerN</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/opensourceprojects/" title="Open Source Projects">
+                    <span>Open Source Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover
+    </h1>
+    <div class="post-meta"><span title='2026-01-13 22:35:48 +0300 +0300'>January 13, 2026</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#what-is-syncjacking" aria-label="What is SyncJacking?">What is SyncJacking?</a></li>
+                <li>
+                    <a href="#entra-connect-and-hard-matching" aria-label="Entra Connect and hard matching">Entra Connect and hard matching</a><ul>
+                        
+                <li>
+                    <a href="#hard-matching" aria-label="Hard matching">Hard matching</a></li>
+                <li>
+                    <a href="#password-hash-synchronization" aria-label="Password hash synchronization">Password hash synchronization</a></li></ul>
+                </li>
+                <li>
+                    <a href="#how-attackers-can-use-hard-matching-to-facilitate-entra-id-account-takeover" aria-label="How attackers can use hard matching to facilitate Entra ID account takeover">How attackers can use hard matching to facilitate Entra ID account takeover</a></li>
+                <li>
+                    <a href="#potential-abuses" aria-label="Potential abuses">Potential abuses</a></li>
+                <li>
+                    <a href="#syncjacking-detection" aria-label="SyncJacking detection">SyncJacking detection</a><ul>
+                        
+                <li>
+                    <a href="#other-ways-to-detect-syncjacking-abuse" aria-label="Other ways to detect SyncJacking abuse">Other ways to detect SyncJacking abuse</a></li></ul>
+                </li>
+                <li>
+                    <a href="#syncjacking-remediation" aria-label="SyncJacking remediation">SyncJacking remediation</a></li>
+                <li>
+                    <a href="#2026-update-vulnerability-confirmed-fix-in-progress" aria-label="2026 update: Vulnerability confirmed; fix in progress">2026 update: Vulnerability confirmed; fix in progress</a></li>
+                <li>
+                    <a href="#why-this-research-matters" aria-label="Why this research matters">Why this research matters</a></li>
+                <li>
+                    <a href="#disclosure-timeline" aria-label="Disclosure timeline">Disclosure timeline</a></li>
+                <li>
+                    <a href="#acknowledgments" aria-label="Acknowledgments">Acknowledgments</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p><strong>January 13, 2026 update:</strong> The SyncJacking technique described in this post has been confirmed by Microsoft Security Response Center (MSRC) as an <strong>Important</strong> privilege escalation vulnerability. Microsoft has implemented platform-level security hardening in Entra Connect to block unauthorized account remapping, with enforcement expected to begin in March 2026 for supported versions.</p>
+<h2 id="what-is-syncjacking">What is SyncJacking?<a hidden class="anchor" aria-hidden="true" href="#what-is-syncjacking">#</a></h2>
+<p>This post describes an abuse of hard matching synchronization in Entra Connect that can lead to Entra ID account takeover. These findings build on the research that Semperis published in August, which described abuse of soft matching (also known as SMTP matching).</p>
+<p><strong>This <em>SyncJacking</em> vulnerability means that an attacker with certain privileges can abuse hard matching synchronization in Entra Connect to completely take over any synchronized Entra ID account—including Active Global Administrator.</strong></p>
+<p>These findings were promptly reported to the Microsoft Security Response Center (MSRC), which updated hardening guidelines to provide more specific mitigations against hard matching abuse. While MSRC rapidly responded and updated the hardening guidelines, further testing shows that the attack can succeed even after these mitigations are implemented. Therefore, we strongly advise extra mitigation to combat abuse and potential Entra ID account takeover.</p>
+<h2 id="entra-connect-and-hard-matching">Entra Connect and hard matching<a hidden class="anchor" aria-hidden="true" href="#entra-connect-and-hard-matching">#</a></h2>
+<p>As explained in “SMTP Matching Abuse in Azure AD,” Entra Connect is a Microsoft application that supports hybrid identity by synchronizing on-prem AD objects with Entra ID objects. Entra Connect features include password hash synchronization, pass-through authentication, federation integration (with ADFS), and synchronization (with Entra Connect Sync).</p>
+<p>The hard-matching Entra ID account takeover discussed here abuses the password hash synchronization and general synchronization features of Entra Connect.</p>
+<p>To achieve integrity between the on-prem environment and Entra ID tenants in hybrid identity implementations, Entra Connect matches user objects between AD and Entra ID. A source anchor attribute, chosen during initial Entra Connect setup and synchronization, uniquely identifies each of these user objects between AD and Entra ID. Entra Connect uses this attribute to match user objects between Entra ID and AD using one of two techniques:</p>
+<ul>
+<li>Hard matching</li>
+<li>Soft (SMTP) matching :contentReference[oaicite:8]{index=8}</li>
+</ul>
+<h3 id="hard-matching">Hard matching<a hidden class="anchor" aria-hidden="true" href="#hard-matching">#</a></h3>
+<p>If you let Azure manage the source anchor, Entra Connect looks for one of two possible <strong>sourceAnchor</strong> attributes:</p>
+<ul>
+<li>Entra Connect version 1.1.486.0 or older looks for the <strong>objectGUID</strong></li>
+<li>Entra Connect version 1.1.524.0 or newer looks for the <strong>mS-DS-ConsistencyGuid</strong></li>
+</ul>
+<p>If the <strong>mS-DS-ConsistencyGuid</strong> attribute is unpopulated, Entra Connect writes the user’s <strong>objectGUID</strong> to that attribute. The corresponding value on the Entra ID object is <strong>ImmutableID</strong> (the base64-encoded <strong>objectGUID</strong>). Figure 1 shows an example of hard matching: getting the <strong>ImmutableID</strong> of an Entra ID object from the on-prem AD user’s <strong>objectGUID</strong>.</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-1_PS-Source-anchor.png"></p>
+<p><strong>This mechanism is the object of the abuse discussed in this post.</strong></p>
+<h3 id="password-hash-synchronization">Password hash synchronization<a hidden class="anchor" aria-hidden="true" href="#password-hash-synchronization">#</a></h3>
+<p>Password hash synchronization, an authentication method that is enabled by default in Entra ID hybrid identity environments, synchronizes the user’s on-prem AD password hash to Entra ID every two minutes. This synchronization enables the use of the same password to log in to both AD and Entra ID. (For a detailed explanation of password hash synchronization, see “Understanding Azure AD Password Hash Sync.”)</p>
+<h2 id="how-attackers-can-use-hard-matching-to-facilitate-entra-id-account-takeover">How attackers can use hard matching to facilitate Entra ID account takeover<a hidden class="anchor" aria-hidden="true" href="#how-attackers-can-use-hard-matching-to-facilitate-entra-id-account-takeover">#</a></h2>
+<p>To perform this attack, an attacker requires only two permissions:</p>
+<ul>
+<li>Write-all-Properties or GenericWrite on an unsynchronized on-prem AD account or Write on mS-DS-ConsistencyGuid</li>
+<li>Delete on a synchronized on-prem AD account</li>
+</ul>
+<p>The following example illustrates this attack on an account with an Active Global Administrator role assignment in Entra ID. <strong>Note that this attack works on <em>any</em> synced account.</strong></p>
+<p>Nutshell is a synchronized Active Global Administrator in Entra ID with the UPN <a href="mailto:nutshell@xd6z7.onmicrosoft.com">nutshell@xd6z7.onmicrosoft.com</a> (Figure 2, Figure 3).</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-2_NutshellIsSynced-1024x62.png">
+<img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-3_nutshellGlobalAdmin-1024x103.png"></p>
+<p>Because nutshell is a synchronized user, it has a presence in the on-prem AD environment. The attacker has Write-All-Properties permission on an unsynchronized on-prem AD account <strong>AliceIC</strong>. The attacker also has Delete permission on the synchronized on-prem AD <strong>nutshell</strong> account. In addition, the attacker has the password for the <strong>AliceIC</strong> account.</p>
+<p>Here’s how the attacker can use the on-prem user <strong>AliceIC</strong> to hijack the <strong>nutshell</strong> Entra ID account.</p>
+<p>First, the attacker copies the <strong>nutshell</strong> Entra ID UPN to the <strong>AliceIC</strong> on-prem AD <strong>userPrincipalName</strong> attribute (Figure 4).</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-4_AliceICNewUPN.png"></p>
+<p>Figure 5 shows the population of the <strong>nutshell</strong> on-prem AD <strong>mS-DS-ConsistencyGuid</strong> attribute.</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-5_nutshellmsds.png"></p>
+<p>Next, the attacker copies the value of the <strong>nutshell</strong> <strong>mS-DS-ConsistencyGuid</strong> attribute into the <strong>AliceIC</strong> <strong>mS-DS-ConsistencyGuid</strong> attribute (Figure 6).</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-6_AliceNewMsdsConsistency.png"></p>
+<p>Finally, the attacker deletes the on-prem <strong>nutshell</strong> account and waits for synchronization (Figure 7).</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Fig7.png"></p>
+<p>Now, the <strong>AliceIC</strong> on-prem AD account is synchronized to the nutshell Entra ID account. Because Entra Connect uses password hash synchronization by default, the <strong>AliceIC</strong> password and DisplayName attribute are also synchronized to the <strong>nutshell</strong> Entra ID account.</p>
+<p><strong>AliceIC</strong> is now an Active Global Administrator and acting on behalf of nutshell (Figure 8). As mentioned earlier, <strong>you will find no trace of these changes in on-prem logs and only minimal trace in Entra ID logs</strong>.</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-8_AliceNowGlobalAdmin-1024x146.png"></p>
+<p>It’s important to note why attackers might exploit this method:</p>
+<ul>
+<li>The use of hard matching to facilitate Entra ID account takeover leaves no trace in on-prem AD logs and only minimal trace in Entra ID logs.</li>
+<li>The attack requires only two permissions on target accounts to completely take over any synchronized account with any role.</li>
+<li>An attacker who possesses relatively high permissions in AD can take over Entra ID by taking over any synchronized account with an Active/Eligible assignment.</li>
+</ul>
+<h2 id="potential-abuses">Potential abuses<a hidden class="anchor" aria-hidden="true" href="#potential-abuses">#</a></h2>
+<p><strong>User delegation</strong>. If a user or group has been delegated control to manage users in one or more organizational units (OUs) with synchronized and unsynchronized users, then that user or group has full control of these objects and can hijack any of them—theoretically even becoming a Global Administrator.</p>
+<p><strong>Account Operators</strong>. Any user in the Account Operators group can manage all accounts and has account creation privileges. Therefore, any Account Operator can hijack any synchronized users.</p>
+<h2 id="syncjacking-detection">SyncJacking detection<a hidden class="anchor" aria-hidden="true" href="#syncjacking-detection">#</a></h2>
+<h3 id="other-ways-to-detect-syncjacking-abuse">Other ways to detect SyncJacking abuse<a hidden class="anchor" aria-hidden="true" href="#other-ways-to-detect-syncjacking-abuse">#</a></h3>
+<p>You can reasonably (although not definitively) assume that this attack has occurred if two log events occur one after another in Entra ID: “Change user password” followed by “Update User” with a changed DisplayName and a target that uses the same UPN (Figure 9, Figure 10).</p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-9_ChangeUserPasswordWith-1024x301.png"></p>
+<p><img loading="lazy" src="/posts/syncjacking/SyncJacking_Figure-10_UpdateUser.png"></p>
+<h2 id="syncjacking-remediation">SyncJacking remediation<a hidden class="anchor" aria-hidden="true" href="#syncjacking-remediation">#</a></h2>
+<p>In 2022, MSRC updated its guidelines to include the following recommendation:</p>
+<p>Disable hard match takeover. Hard match takeover allows Entra Connect to take control of a cloud managed object and changing the source of authority for the object to Active Directory. Once the source of authority of an object is taken over by Entra Connect, changes made to the Active Directory object that is linked to the Entra ID object will overwrite the original Entra ID data – including the password hash, if Password Hash Sync is enabled.</p>
+<p>An attacker could use this capability to take over control of cloud-managed objects. To mitigate this risk, disable hard match takeover.</p>
+<p>Our testing shows that SyncJacking works even after disabling hard match takeover. Regardless, this hardening guideline is important to apply.</p>
+<p>MSRC states that it is important to enable MFA for all users who have privileged access in Entra ID or in AD. Currently, the only way to mitigate this attack is to enforce MFA on all synced users. This isn’t a surefire way to stop an attacker from accessing your account if SyncJacking is abused, but it can help. Be sure to follow all hardening guidelines provided by Microsoft in the previous link to mitigate many attack surfaces in your hybrid identity environment.</p>
+<p>For even greater protection, consider implementing DSP for Identity Threat Detection and Response (ITDR).</p>
+<h2 id="2026-update-vulnerability-confirmed-fix-in-progress">2026 update: Vulnerability confirmed; fix in progress<a hidden class="anchor" aria-hidden="true" href="#2026-update-vulnerability-confirmed-fix-in-progress">#</a></h2>
+<p>Since the publication of this original research, MSRC has confirmed the vulnerability underlying the SyncJacking attack technique.</p>
+<p>As explained earlier in this blog, SyncJacking abuses identity-matching behavior in hybrid environments to remap an existing Entra ID account to an attacker-controlled on-premises object, resulting in full account takeover. This behavior is not the result of a misconfiguration alone, but of how synchronization trust boundaries were enforced.</p>
+<p>Following responsible disclosure, Microsoft acknowledged the risk and has been working on platform-level protections to prevent this abuse. Microsoft has now implemented security hardening in Entra Connect. This hardening is designed to block unauthorized account remapping scenarios that enable SyncJacking attacks.</p>
+<p>Microsoft has announced that these protections are being rolled out and enforced, with full enforcement expected to begin in March 2026, depending on tenant configuration and Entra Connect version. Organizations must ensure that they are running a supported and up-to-date version of Entra Connect to benefit from these protections.</p>
+<h2 id="why-this-research-matters">Why this research matters<a hidden class="anchor" aria-hidden="true" href="#why-this-research-matters">#</a></h2>
+<p>As shown earlier in this blog, identity synchronization is a powerful trust bridge between on-premises Active Directory and Entra ID. The confirmation and remediation of this vulnerability reinforce a key takeaway: Hybrid identity components must be treated as security-critical infrastructure, not just integration tooling.</p>
+<h2 id="disclosure-timeline">Disclosure timeline<a hidden class="anchor" aria-hidden="true" href="#disclosure-timeline">#</a></h2>
+<ul>
+<li>October 6, 2022: Semperis discovers abuse and reports it to MSRC.</li>
+<li>October 12, 2022: MSRC replies with hardening guidelines.</li>
+<li>October 18, 2022: Semperis responds to MSRC with new information; attack still works with mitigations applied.</li>
+<li>October 27, 2022: MSRC reopens the case to review the information.</li>
+<li>November 4, 2022: MSRC updates documentation hardening guidelines to specifically mitigate against hard matching abuse, and notes that the hard matching behavior described here is by design.</li>
+<li>November 7, 2022: Semperis responds to MSRC; attack still works with hardening guidelines applied.</li>
+<li>November 11, 2022: MSRC maintains that the behavior is by design.</li>
+<li>May 2025: MSRC confirms this vulnerability as an Important privilege escalation vulnerability.</li>
+<li>Late 2025: Microsoft announces Entra Connect security hardening to prevent account remapping abuse</li>
+<li>March 2026 (planned): Enforcement of protections begins for supported Entra Connect versions</li>
+</ul>
+<h2 id="acknowledgments">Acknowledgments<a hidden class="anchor" aria-hidden="true" href="#acknowledgments">#</a></h2>
+<p>Special thanks to the following people:</p>
+<ul>
+<li>Andrea Pierini (@decoder_it)</li>
+<li>Charlie Clark (@exploitph)</li>
+<li>Sapir Federovsky (@sapirxfed)</li>
+</ul>
+<p>Special acknowledgment to MSRC for recognizing the exposure and rapidly responding with updated guidelines.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/scenario3/">
+    <span class="title">Next »</span>
+    <br>
+    <span>EntraGoat Scenario 3: Exploiting Group Ownership in Entra ID</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover on x"
+            href="https://x.com/intent/tweet/?text=SyncJacking%3a%20Hard%20Matching%20Vulnerability%20Enables%20Entra%20ID%20Account%20Takeover&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f&amp;title=SyncJacking%3a%20Hard%20Matching%20Vulnerability%20Enables%20Entra%20ID%20Account%20Takeover&amp;summary=SyncJacking%3a%20Hard%20Matching%20Vulnerability%20Enables%20Entra%20ID%20Account%20Takeover&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f&title=SyncJacking%3a%20Hard%20Matching%20Vulnerability%20Enables%20Entra%20ID%20Account%20Takeover">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover on whatsapp"
+            href="https://api.whatsapp.com/send?text=SyncJacking%3a%20Hard%20Matching%20Vulnerability%20Enables%20Entra%20ID%20Account%20Takeover%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover on telegram"
+            href="https://telegram.me/share/url?text=SyncJacking%3a%20Hard%20Matching%20Vulnerability%20Enables%20Entra%20ID%20Account%20Takeover&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share SyncJacking: Hard Matching Vulnerability Enables Entra ID Account Takeover on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=SyncJacking%3a%20Hard%20Matching%20Vulnerability%20Enables%20Entra%20ID%20Account%20Takeover&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fsyncjacking%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">TomerN</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
